@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+apiVersion: v2
+name: controlplane-operations
+version: 1.0.0
+description: A set of Plutono dashboards and Prometheus alerting rules combined with playbooks to ensure effective operations of Controlplane clusters.
+maintainers:
+  - name: Vladimir Videlov (d051408)
+    email: vladimir.videlov@sap.com
+keywords:
+  - Helm Chart
+  - Controlplane operations
+  - Plutono Dashboards
+  - Prometheus Alerting
+  - Alert Rules
+  - Playbooks

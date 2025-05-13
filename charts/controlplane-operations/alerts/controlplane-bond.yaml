@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 groups:
-- name: controlplane.alerts
+- name: controlplane.bond.alerts
   rules:
     ### Bonding health ###
     - alert: NodeBondDegradedNetwork
@@ -13,12 +13,13 @@ groups:
         service: node
         severity: critical
         context: bond
-        meta: "{{ $labels.node }}"
+        meta: "`{{`{{ $labels.node }}`}}`"
         support_group: containers
         playbook: "docs/support/playbook/kubernetes/k8s_bond_degraded"
       annotations:
-        description: Bond {{ $labels.master }} on {{ $labels.node }} is degraded.
-        summary: Bond {{ $labels.master }} is degraded. Node network connectivity is not HA. Customer network datapath threatened! Switch failover or ACI upgrade will cause an outage!
+        description: Bond `{{`{{ $labels.master }}`}}` on `{{`{{ $labels.node }}`}}` is degraded.
+        summary: Bond `{{`{{ $labels.master }}`}}` is degraded. Node network connectivity is not HA. Customer network datapath threatened! Switch failover or ACI upgrade will cause an outage!
+
     - alert: NodeBondDegradedMain
       expr: sum(node_bonding_active{master="bond2",node=~".*cloud.sap"}) by (master, node) < 2
       for: 15m
@@ -27,12 +28,13 @@ groups:
         service: node
         severity: warning
         context: bond
-        meta: "{{ $labels.node }}"
+        meta: "`{{`{{ $labels.node }}`}}`"
         support_group: containers
         playbook: "docs/support/playbook/kubernetes/k8s_bond_degraded"
       annotations:
-        description: Bond {{ $labels.master }} on {{ $labels.node }} is degraded. Imminent network outage for this node.
-        summary: Bond {{ $labels.master }} is degraded. Node network connectivity is not HA. Switch failover or ACI upgrade will cause an outage!
+        description: Bond `{{`{{ $labels.master }}`}}` on `{{`{{ $labels.node }}`}}` is degraded. Imminent network outage for this node.
+        summary: Bond `{{`{{ $labels.master }}`}}` is degraded. Node network connectivity is not HA. Switch failover or ACI upgrade will cause an outage!
+
     - alert: NodeVirtualInterfaceDown
       expr: sum(node_network_up{device=~"bond.*|vlan.*"} == 0) by (node, device)
       for: 15m
@@ -41,9 +43,9 @@ groups:
         service: node
         severity: warning
         context: bond
-        meta: "{{ $labels.node }}"
+        meta: "`{{`{{ $labels.node }}`}}`"
         support_group: containers
         playbook: "docs/support/playbook/kubernetes/k8s_node_interface_down"
       annotations:
-        description: Interface {{ $labels.device }} on {{ $labels.node }} is down. Tenant network outage for this node.
-        summary: Interface {{ $labels.device }} is down. Node network connectivity is degraded. Check ESX node state in vCenter.
+        description: Interface `{{`{{ $labels.device }}`}}` on `{{`{{ $labels.node }}`}}` is down. Tenant network outage for this node.
+        summary: Interface `{{`{{ $labels.device }}`}}` is down. Node network connectivity is degraded. Check ESX node state in vCenter.

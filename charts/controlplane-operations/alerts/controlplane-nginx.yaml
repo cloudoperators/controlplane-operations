@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and Greenhouse contributors
+# SPDX-License-Identifier: Apache-2.0
+
+groups:
+- name: controlplane.nginx
+  rules:
+  - record: api_errors_per_request_sli:ratio_rate5m
+    expr: |2
+      (sum by(region, ingress) (rate(nginx_ingress_controller_requests{status=~"5.."}[5m]))
+      or
+      (0 * count by(region, ingress) (nginx_ingress_controller_requests{ingress!=""})))
+      /
+      sum by(region, ingress) (rate(nginx_ingress_controller_requests[5m]))
+
+  - record: api_errors_per_request_sli:ratio_rate1h
+    expr: |2
+      (sum by(region, ingress) (rate(nginx_ingress_controller_requests{status=~"5.."}[1h]))
+      or
+      (0 * count by(region, ingress) (nginx_ingress_controller_requests{ingress!=""})))
+      /
+      sum by(region, ingress) (rate(nginx_ingress_controller_requests[1h]))
+
+  - record: api_errors_per_request_sli:ratio_rate2h
+    expr: |2
+      (sum by(region, ingress) (rate(nginx_ingress_controller_requests{status=~"5.."}[2h]))
+      or
+      (0 * count by(region, ingress) (nginx_ingress_controller_requests{ingress!=""})))
+      /
+      sum by(region, ingress) (rate(nginx_ingress_controller_requests[2h]))
+
+  - record: api_errors_per_request_sli:ratio_rate1d
+    expr: |2
+      (sum by(region, ingress) (rate(nginx_ingress_controller_requests{status=~"5.."}[1d]))
+      or
+      (0 * count by(region, ingress) (nginx_ingress_controller_requests{ingress!=""})))
+      /
+      sum by(region, ingress) (rate(nginx_ingress_controller_requests[1d]))
+
+  - record: api_errors_per_request_sli:ratio_rate7d
+    expr: |2
+      (sum by(region, ingress) (rate(nginx_ingress_controller_requests{status=~"5.."}[7d]))
+      or
+      (0 * count by(region, ingress) (nginx_ingress_controller_requests{ingress!=""})))
+      /
+      sum by(region, ingress) (rate(nginx_ingress_controller_requests[7d]))

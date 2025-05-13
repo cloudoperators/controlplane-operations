@@ -35,7 +35,7 @@ spec:
     - name: dashboards.create
       description: Create Plutono dashboards
       required: false
-      default: true
+      default: false
       type: bool
     - name: dashboards.dashboardSelector
       description: Selector for dashboards to be picked up by the Plutono. List of key-value pairs.

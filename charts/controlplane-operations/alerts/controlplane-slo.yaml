@@ -13,6 +13,23 @@ groups:
         ingress: "manila-api"
     expr: "99.8"
 
+  - record: api_errors_per_request_sli:ratio_rate2h
+    expr: |2
+      (sum by(region, ingress) (rate(nginx_ingress_controller_requests{status=~"5.."}[2h]))
+      or
+      (0 * count by(region, ingress) (nginx_ingress_controller_requests{ingress!=""})))
+      /
+      sum by(region, ingress) (rate(nginx_ingress_controller_requests[2h]))
+
+  - record: api_errors_per_request_sli:ratio_rate7d
+    expr: |2
+      (sum by(region, ingress) (rate(nginx_ingress_controller_requests{status=~"5.."}[7d]))
+      or
+      (0 * count by(region, ingress) (nginx_ingress_controller_requests{ingress!=""})))
+      /
+      sum by(region, ingress) (rate(nginx_ingress_controller_requests[7d]))
+
+
 # https://landing.google.com/sre/workbook/chapters/alerting-on-slos/#short_and_long_windows_for_alerting
 - name: controlplane.slo.alerts
   rules:

@@ -1,36 +1,28 @@
-# SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and Greenhouse contributors
-# SPDX-License-Identifier: Apache-2.0
-
 groups:
-- name: controlplane.bond.alerts
+- name: controlplane-bond
   rules:
-    ### Bonding health ###
-    - alert: NodeBondDegradedMain
-      expr: sum(node_bonding_active) by (master, node) < 2
-      for: 15m
-      labels:
-        tier: k8s
-        service: node
-        severity: warning
-        context: bond
-        meta: "`{{`{{ $labels.node }}`}}`"
-        support_group: containers
-        playbook: "docs/support/playbook/kubernetes/k8s_bond_degraded"
-      annotations:
-        description: Bond `{{`{{ $labels.master }}`}}` on `{{`{{ $labels.node }}`}}` is degraded. Imminent network outage for this node.
-        summary: Bond `{{`{{ $labels.master }}`}}` is degraded. Node network connectivity is not HA. Switch failover or upgrade will cause an outage!
+{{- if not (.Values.prometheusRules.disabled.NodeBondDegradedMain | default false) }}
+  - alert: NodeBondDegradedMain
+    expr: sum(node_bonding_active) by (master, node) < 2
+    for: {{ dig "NodeBondDegradedMain" "for" "15m" .Values.prometheusRules }}
+    labels:
+      severity: {{ dig "NodeBondDegradedMain" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeBondDegradedMain.md
+      {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }}
+    annotations:
+      description: Bond `{{`{{ $labels.master }}`}}` on `{{`{{ $labels.node }}`}}` is degraded. Imminent network outage for this node.
+      summary: Bond `{{`{{ $labels.master }}`}}` is degraded. Node network connectivity is not HA. Switch failover or upgrade will cause an outage!
+{{- end }}
 
-    - alert: NodeVirtualInterfaceDown
-      expr: sum(node_network_up{device=~"bond.*|vlan.*"} == 0) by (node, device)
-      for: 15m
-      labels:
-        tier: k8s
-        service: node
-        severity: warning
-        context: bond
-        meta: "`{{`{{ $labels.node }}`}}`"
-        support_group: containers
-        playbook: "docs/support/playbook/kubernetes/k8s_node_interface_down"
-      annotations:
-        description: Interface `{{`{{ $labels.device }}`}}` on `{{`{{ $labels.node }}`}}` is down. Tenant network outage for this node.
-        summary: Interface `{{`{{ $labels.device }}`}}` is down. Node network connectivity is degraded. Check ESX node state in vCenter.
+{{- if not (.Values.prometheusRules.disabled.NodeVirtualInterfaceDown | default false) }}
+  - alert: NodeVirtualInterfaceDown
+    expr: sum(node_network_up{device=~"bond.*|vlan.*"} == 0) by (node, device)
+    for: {{ dig "NodeVirtualInterfaceDown" "for" "15m" .Values.prometheusRules }}
+    labels:
+      severity: {{ dig "NodeVirtualInterfaceDown" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeVirtualInterfaceDown.md
+      {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }}
+    annotations:
+      description: Interface `{{`{{ $labels.device }}`}}` on `{{`{{ $labels.node }}`}}` is down. Tenant network outage for this node.
+      summary: Interface `{{`{{ $labels.device }}`}}` is down. Node network connectivity is degraded. 
+{{- end }}

@@ -1,21 +1,15 @@
-# SPDX-FileCopyrightText: 2024 SAP SE or an SAP affiliate company and Greenhouse contributors
-# SPDX-License-Identifier: Apache-2.0
-
 groups:
 - name: controlplane.node.alerts
   rules:
-    ### Node Bridge ###
-    - alert: KubernetesNodeBridgeFilterVLANTagged
-      expr: kube_node_status_condition{condition="BridgeFilterVLANTagged", status="true"} == 1
-      for: 15m
-      labels:
-        tier: k8s
-        service: node
-        severity: info
-        context: label
-        meta: "`{{`{{ $labels.node }}`}}`"
-        support_group: containers
-        playbook: "docs/support/playbook/kubernetes/k8s_node_bridge_filter_iptables"
-      annotations:
-        description: VLAN-tagged ARP/IP traffic is filtered by ARPtables/IPtables on `{{`{{ $labels.node }}`}}`. Network datapath threatened!
-        summary: Bridged VLAN-tagged traffic is filtered by IPtables.
+{{- if not (.Values.prometheusRules.disabled.KubernetesNodeBridgeFilterVLANTagged | default false) }}
+  - alert: KubernetesNodeBridgeFilterVLANTagged
+    expr: kube_node_status_condition{condition="BridgeFilterVLANTagged", status="true"} == 1
+    for: {{ dig "KubernetesNodeBridgeFilterVLANTagged" "for" "15m" .Values.prometheusRules }}
+    labels:
+      severity: {{ dig "KubernetesNodeBridgeFilterVLANTagged" "severity" "info" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesNodeBridgeFilterVLANTagged.md
+      {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }} 
+    annotations:
+      description: VLAN-tagged ARP/IP traffic is filtered by ARPtables/IPtables on `{{`{{ $labels.node }}`}}`. Network datapath threatened!
+      summary: Bridged VLAN-tagged traffic is filtered by IPtables.
+{{- end }}

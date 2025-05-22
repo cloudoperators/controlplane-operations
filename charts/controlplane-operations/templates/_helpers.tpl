@@ -33,9 +33,9 @@ plugin: {{ $root.Release.Name }}
 {{- $path := index . 0 -}}
 {{- $root := index . 1 -}}
 plugin: {{ $root.Release.Name }}
-{{- if $root.Values.dashboards.plutonoSelectors }}
-{{- range $i, $target := $root.Values.dashboards.plutonoSelectors }}
-{{ $target.name | required (printf "$.Values.dashboards.plutonoSelectors.[%v].name missing" $i) }}: {{ tpl ($target.value | required (printf "$.Values.dashboards.plutonoSelectors.[%v].value missing" $i)) $ }}
+{{- if $root.Values.dashboards.persesSelectors }}
+{{- range $i, $target := $root.Values.dashboards.persesSelectors }}
+{{ $target.name | required (printf "$.Values.dashboards.persesSelectors.[%v].name missing" $i) }}: {{ tpl ($target.value | required (printf "$.Values.dashboards.persesSelectors.[%v].value missing" $i)) $ }}
 {{- end }}
 {{- end }}
 {{- end }}

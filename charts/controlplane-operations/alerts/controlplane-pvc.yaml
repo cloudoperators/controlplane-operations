@@ -1,5 +1,5 @@
 groups:
-- name: controlplane.pvc
+- name: controlplane-pvc
   rules:
     - record: kubelet_volume_stats_available_percent
       expr: (min by (persistentvolumeclaim, namespace) (100 * kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes)) 

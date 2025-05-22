@@ -1,5 +1,5 @@
 groups:
-- name: controlplane.node.alerts
+- name: controlplane-node
   rules:
 {{- if not (.Values.prometheusRules.disabled.KubernetesNodeBridgeFilterVLANTagged | default false) }}
   - alert: KubernetesNodeBridgeFilterVLANTagged

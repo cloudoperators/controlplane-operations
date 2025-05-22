@@ -4,7 +4,7 @@
 
 ## About this project
 
-A set of Plutono dashboards and Prometheus alert rules combined with playbooks to ensure effective operation of Controlplane clusters within the ApeiroRA stack.
+A set of Perses dashboards and Prometheus alert rules combined with playbooks to ensure effective operation of Controlplane clusters within the ApeiroRA stack.
 
 # Content
 
@@ -21,14 +21,14 @@ controlplane-operations
               │
               ├── alerts             Prometheus alerts for kubernetes.
               │
-              ├── dashboards         Plutono dashboards for visualizing key metrics.
+              ├── dashboards         Perses dashboards for visualizing key metrics.
               │
               └── Chart.yaml         Helm chart manifest.
 ```
 
 ## Requirements and Setup
 
-The content of the repository can be installed independently or as part of the [greenhouse-extensions](https://github.com/cloudoperators/greenhouse-extensions/tree/main/kube-monitoring).
+The content of the repository can be installed as a [Greenhouse](https://github.com/cloudoperators/greenhouse) Plugin. 
 
 ## Support, Feedback, Contributing
 

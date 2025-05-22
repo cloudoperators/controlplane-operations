@@ -52,7 +52,7 @@ dashboards:
   ## Enables ConfigMap resources with dashboards to be created
   create: false
 
-  ## Label selectors for the Plutono dashboards to be picked up by Plutono.
-  plutonoSelectors:
-    - name: plutono-dashboard
+  # -- Label selectors for the Perses dashboards to be picked up by Perses.
+  persesSelectors:
+    - name: perses.dev/resource
       value: '"true"'

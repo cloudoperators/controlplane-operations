@@ -4,7 +4,7 @@
 
 ## About this project
 
-A set of Plutono dashboards and Prometheus alert rules combined with playbooks to ensure effective operation of Controlplane clusters within the ApeiroRA stack.
+A set of Perses dashboards and Prometheus alert rules combined with playbooks to ensure effective operation of Controlplane clusters within the ApeiroRA stack.
 
 ## Requirements and Setup
 

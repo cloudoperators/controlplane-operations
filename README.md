@@ -6,9 +6,29 @@
 
 A set of Perses dashboards and Prometheus alert rules combined with playbooks to ensure effective operation of Controlplane clusters within the ApeiroRA stack.
 
+# Content
+
+The content is structured as follows:
+
+```
+controlplane-operations
+    │
+    ├── playbooks/              Step-by-step instructions for troubleshooting.
+    │
+    └── charts/
+         │
+         └── controlplane-operations
+              │
+              ├── alerts             Prometheus alerts for kubernetes.
+              │
+              ├── dashboards         Perses dashboards for visualizing key metrics.
+              │
+              └── Chart.yaml         Helm chart manifest.
+```
+
 ## Requirements and Setup
 
-*Insert a short description what is required to get your project running...*
+The content of the repository can be installed as a [Greenhouse](https://github.com/cloudoperators/greenhouse) Plugin. 
 
 ## Support, Feedback, Contributing
 

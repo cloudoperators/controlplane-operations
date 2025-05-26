@@ -3,7 +3,7 @@ kind: PluginDefinition
 metadata:
   name: controlplane-operations
 spec:
-  version: 1.0.3
+  version: 1.0.4
   displayName: Controlplane operations bundle
   description: Operations bundle for Controlane clusters
   docMarkDownUrl: https://raw.githubusercontent.com/cloudoperators/controlplane-operations/main/README.md
@@ -11,7 +11,7 @@ spec:
   helmChart:
     name: controlplane-operations
     repository: oci://ghcr.io/cloudoperators/controlplane-operations/charts
-    version: 1.0.3
+    version: 1.0.4
   options:
     - name: prometheusRules.create
       description: Create Prometheus rules

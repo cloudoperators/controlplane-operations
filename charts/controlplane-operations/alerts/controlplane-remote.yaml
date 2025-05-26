@@ -1,0 +1,17 @@
+groups:
+- name: controlplane-remote
+  rules:
+{{- if not (.Values.prometheusRules.disabled.ArgoraUpdateInError | default false) }}
+  - alert: ArgoraUpdateInError
+    expr: >
+      kube_customresource_status_state{customresource_kind="Update",customresource_group="argora.cloud.sap",state=~"Error"}
+      == 1
+    for: {{ dig "ArgoraUpdateInError" "for" "1m" .Values.prometheusRules }}
+    labels:
+      severity: {{ dig "ArgoraUpdateInError" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ArgoraUpdateInError.md
+      {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }}
+    annotations:
+      description: Argora Update CR status is in Error state for more than 1 minute.
+      summary: Update CR in Error state.
+{{- end }}

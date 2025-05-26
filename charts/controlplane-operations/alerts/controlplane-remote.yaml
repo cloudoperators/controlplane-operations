@@ -1,5 +1,5 @@
 groups:
-- name: controlplane-remote
+- name: controlplane-remote.alerts
   rules:
 {{- if not (.Values.prometheusRules.disabled.ArgoraUpdateInError | default false) }}
   - alert: ArgoraUpdateInError
@@ -12,6 +12,6 @@ groups:
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ArgoraUpdateInError.md
       {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }}
     annotations:
-      description: Argora Update CR status is in Error state for more than 1 minute.
-      summary: Update CR in Error state.
+      description: "Argora Update CR status is in Error state for more than 1 minute."
+      summary: "Update CR in Error state."
 {{- end }}

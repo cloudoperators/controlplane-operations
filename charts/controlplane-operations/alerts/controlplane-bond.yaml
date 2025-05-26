@@ -8,7 +8,7 @@ groups:
     labels:
       severity: {{ dig "NodeBondDegradedMain" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeBondDegradedMain.md
-      {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }}
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: Bond `{{`{{ $labels.master }}`}}` on `{{`{{ $labels.node }}`}}` is degraded. Imminent network outage for this node.
       summary: Bond `{{`{{ $labels.master }}`}}` is degraded. Node network connectivity is not HA. Switch failover or upgrade will cause an outage!
@@ -21,7 +21,7 @@ groups:
     labels:
       severity: {{ dig "NodeVirtualInterfaceDown" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeVirtualInterfaceDown.md
-      {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }}
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: Interface `{{`{{ $labels.device }}`}}` on `{{`{{ $labels.node }}`}}` is down. Tenant network outage for this node.
       summary: Interface `{{`{{ $labels.device }}`}}` is down. Node network connectivity is degraded.

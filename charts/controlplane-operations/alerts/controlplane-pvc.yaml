@@ -13,7 +13,7 @@ groups:
     labels:
       severity: {{ dig "KubernetesPVCNoSpaceLeft" "severity" "info" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesPVCNoSpaceLeft.md
-      {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }}
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: "The PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` is almost full. Increase or delete files."
       summary: "PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` free space is less than 10%."
@@ -26,7 +26,7 @@ groups:
     labels:
       severity: {{ dig "KubernetesPVCNoSpaceLeft" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesPVCNoSpaceLeft.md
-      {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }}
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: "The PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` is full. Programs will stop working if relying upon free storage."
       summary: "PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` usage is over 98%."

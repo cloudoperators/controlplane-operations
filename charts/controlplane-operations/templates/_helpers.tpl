@@ -22,7 +22,7 @@ plugin: {{ $root.Release.Name }}
 
 {{- define "controlplane-operations.additionalRuleLabels" }}
 {{- if .Values.prometheusRules.additionalRuleLabels }}
-{{- toYaml .Values.prometheusRules.additionalRuleLabels }}
+{{- toYaml .Values.prometheusRules.additionalRuleLabels | nindent 6 }}
 {{- end }}
 {{- if .Values.global.commonLabels }}
 {{ tpl (toYaml .Values.global.commonLabels) . }}

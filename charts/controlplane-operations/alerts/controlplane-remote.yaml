@@ -10,7 +10,7 @@ groups:
     labels:
       severity: {{ dig "ArgoraUpdateInError" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ArgoraUpdateInError.md
-      {{ include "controlplane-operations.additionalRuleLabels" . | nindent 6 }}
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: "Argora Update CR status is in Error state for more than 1 minute."
       summary: "Update CR in Error state."

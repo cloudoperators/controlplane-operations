@@ -15,3 +15,17 @@ groups:
       description: "Argora Update CR status is in Error state for more than 1 minute."
       summary: "Update CR in Error state."
 {{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.ArgoraPodNotReadyError | default false) }}
+  - alert: ArgoraPodNotReadyError
+    expr: >
+      kube_pod_status_ready{namespace="shoot-control-plane",pod=~"argora-controller-manager-.+",condition="true"} == 0
+    for: {{ dig "ArgoraPodNotReadyError" "for" "5m" .Values.prometheusRules }}
+    labels:
+      severity: {{ dig "ArgoraPodNotReadyError" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ArgoraPodNotReadyError.md
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+    annotations:
+      description: "Argora Pod is not ready for more than 5 minutes."
+      summary: "Pod not ready."
+{{- end }}

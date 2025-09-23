@@ -15,3 +15,18 @@ groups:
       description: "Argora Update CR status is in Error state for more than 1 minute."
       summary: "Update CR in Error state."
 {{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.ArgoraClusterImportInError | default false) }}
+  - alert: ArgoraClusterImportInError
+    expr: >
+      kube_customresource_status_state{customresource_kind="ClusterImport",customresource_group="argora.cloud.sap",state=~"Error"}
+      == 1
+    for: {{ dig "ArgoraClusterImportInError" "for" "1m" .Values.prometheusRules }}
+    labels:
+      severity: {{ dig "ArgoraClusterImportInError" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ArgoraClusterImportInError.md
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+    annotations:
+      description: "Argora ClusterImport CR status is in Error state for more than 1 minute."
+      summary: "ClusterImport CR in Error state."
+{{- end }}

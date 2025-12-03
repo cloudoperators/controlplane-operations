@@ -2,6 +2,25 @@ apiVersion: v1
 entries:
   controlplane-operations:
   - apiVersion: v2
+    created: "2025-12-03T12:01:53.715304187Z"
+    description: A set of Plutono dashboards and Prometheus alerting rules combined
+      with playbooks to ensure effective operations of Controlplane clusters.
+    digest: afa74bfa2585a1f2ef37d1fa00706dc4f92d1077183eb2052e46d48fd65841eb
+    keywords:
+    - Helm Chart
+    - Controlplane operations
+    - Plutono Dashboards
+    - Prometheus Alerting
+    - Alert Rules
+    - Playbooks
+    maintainers:
+    - email: vladimir.videlov@sap.com
+      name: Vladimir Videlov (d051408)
+    name: controlplane-operations
+    urls:
+    - https://github.com/cloudoperators/controlplane-operations/releases/download/controlplane-operations-1.0.10/controlplane-operations-1.0.10.tgz
+    version: 1.0.10
+  - apiVersion: v2
     created: "2025-11-24T15:46:51.020984014Z"
     description: A set of Plutono dashboards and Prometheus alerting rules combined
       with playbooks to ensure effective operations of Controlplane clusters.
@@ -20,4 +39,4 @@ entries:
     urls:
     - https://github.com/cloudoperators/controlplane-operations/releases/download/controlplane-operations-1.0.9/controlplane-operations-1.0.9.tgz
     version: 1.0.9
-generated: "2025-11-24T15:46:51.020991738Z"
+generated: "2025-12-03T12:01:53.715315338Z"

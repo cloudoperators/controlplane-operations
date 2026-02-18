@@ -19,7 +19,7 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.ArgoraPodNotReadyError | default false) }}
   - alert: ArgoraPodNotReadyError
     expr: >
-      kube_pod_status_ready{namespace="shoot-control-plane",pod=~"argora-controller-manager-.+",condition="true"} == 0
+      kube_pod_status_ready{pod=~"argora-controller-manager-.+",condition="true"} == 0
     for: {{ dig "ArgoraPodNotReadyError" "for" "5m" .Values.prometheusRules }}
     labels:
       severity: {{ dig "ArgoraPodNotReadyError" "severity" "warning" .Values.prometheusRules }}

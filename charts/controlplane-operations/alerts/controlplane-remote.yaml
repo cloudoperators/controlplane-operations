@@ -9,7 +9,7 @@ groups:
     for: {{ dig "ArgoraUpdateInError" "for" "10m" .Values.prometheusRules }}
     labels:
       severity: {{ dig "ArgoraUpdateInError" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ArgoraUpdateInError.md
+      playbook: https://github.com/cloudoperators/controlplane-operations/playbooks/ArgoraUpdateInError.md
       {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: "Argora Update CR status is in Error state for more than 10 minutes."
@@ -24,7 +24,7 @@ groups:
     for: {{ dig "ArgoraClusterImportInError" "for" "10m" .Values.prometheusRules }}
     labels:
       severity: {{ dig "ArgoraClusterImportInError" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ArgoraClusterImportInError.md
+      playbook: https://github.com/cloudoperators/controlplane-operations/playbooks/ArgoraClusterImportInError.md
       {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: "Argora ClusterImport CR status is in Error state for more than 10 minutes."
@@ -38,7 +38,7 @@ groups:
     for: {{ dig "ArgoraPodNotReadyError" "for" "5m" .Values.prometheusRules }}
     labels:
       severity: {{ dig "ArgoraPodNotReadyError" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ArgoraPodNotReadyError.md
+      playbook: https://github.com/cloudoperators/controlplane-operations/playbooks/ArgoraPodNotReadyError.md
       {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: "Argora Pod is not ready for more than 5 minutes."

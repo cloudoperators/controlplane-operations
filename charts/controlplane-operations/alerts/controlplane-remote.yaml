@@ -9,7 +9,7 @@ groups:
     for: {{ dig "ArgoraUpdateInError" "for" "10m" .Values.prometheusRules }}
     labels:
       severity: {{ dig "ArgoraUpdateInError" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cloudoperators/controlplane-operations/playbooks/ArgoraUpdateInError.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-update-in-error/ #TODO: add playbook
       {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: "Argora Update CR status is in Error state for more than 10 minutes."
@@ -24,7 +24,7 @@ groups:
     for: {{ dig "ArgoraClusterImportInError" "for" "10m" .Values.prometheusRules }}
     labels:
       severity: {{ dig "ArgoraClusterImportInError" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cloudoperators/controlplane-operations/playbooks/ArgoraClusterImportInError.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-clusterimport-in-error/ #TODO: add playbook
       {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: "Argora ClusterImport CR status is in Error state for more than 10 minutes."
@@ -38,9 +38,24 @@ groups:
     for: {{ dig "ArgoraPodNotReadyError" "for" "5m" .Values.prometheusRules }}
     labels:
       severity: {{ dig "ArgoraPodNotReadyError" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cloudoperators/controlplane-operations/playbooks/ArgoraPodNotReadyError.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-pod-not-ready/ #TODO: add playbook
       {{ include "controlplane-operations.additionalRuleLabels" . }}
     annotations:
       description: "Argora Pod is not ready for more than 5 minutes."
       summary: "Pod not ready."
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.ServerStuckInDiscovery | default false) }}
+  - alert: ServerStuckInDiscovery
+    expr: >
+      kube_customresource_status_state{customresource_kind="Server",customresource_group="metal.ironcore.dev",state=~"Discovery"}
+      == 1
+    for: {{ dig "ServerStuckInDiscovery" "for" "15m" .Values.prometheusRules }}
+    labels:
+      severity: {{ dig "ServerStuckInDiscovery" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/server-stuck-in-discovery/ #TODO: add playbook
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+    annotations:
+      description: "Server is stuck in Discovery for more than 15 minutes."
+      summary: "Server stuck in Discovery."
 {{- end }}

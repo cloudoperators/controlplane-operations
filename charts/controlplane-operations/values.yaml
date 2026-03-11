@@ -26,12 +26,12 @@ prometheusRules:
   ## Annotations for PrometheusRules
   annotations: {}
 
+  ## Default support group for alerts. This is used if no support group label is defined for an alert.
+  defaultSupportGroup: ""
+
   ## Additional labels for PrometheusRule alerts
   ## This is useful for adding additional labels of alerts to each rule
-  additionalRuleLabels:
-    common: {}
-    supportGroupContainers: {}
-    supportGroupFoundation: {}
+  additionalRuleLabels: {}
 
   ## Additional annotations for PrometheusRule alerts
   additionalRuleAnnotations: {}
@@ -41,6 +41,11 @@ prometheusRules:
   # KubernetesApiServerDown: true
   # KubeletDown: true
 
+  # NodeVirtualInterfaceDown:
+  #   service: "cc-cp"
+  #   supportGroup: "containers"
+  #   for: "15m"
+  #   severity: "warning"
 
 ## Create default dashboards for monitoring the cluster
 ##

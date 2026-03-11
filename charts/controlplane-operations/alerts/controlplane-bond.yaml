@@ -6,10 +6,11 @@ groups:
     expr: sum(node_bonding_active) by (master, node) < 2
     for: {{ dig "NodeBondDegradedMain" "for" "15m" .Values.prometheusRules }}
     labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "NodeBondDegradedMain" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeBondDegradedMain.md
-      {{ include "controlplane-operations.additionalRuleLabels.common" . }}
-      {{ include "controlplane-operations.additionalRuleLabels.supportGroupContainers" . }}
+      service: {{ dig "NodeBondDegradedMain" "service" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "NodeBondDegradedMain" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: Bond `{{`{{ $labels.master }}`}}` on `{{`{{ $labels.node }}`}}` is degraded. Imminent network outage for this node.
       summary: Bond `{{`{{ $labels.master }}`}}` is degraded. Node network connectivity is not HA. Switch failover or upgrade will cause an outage!
@@ -20,10 +21,11 @@ groups:
     expr: sum(node_network_up{device=~"bond.*|vlan.*"} == 0) by (node, device)
     for: {{ dig "NodeVirtualInterfaceDown" "for" "15m" .Values.prometheusRules }}
     labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "NodeVirtualInterfaceDown" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeVirtualInterfaceDown.md
-      {{ include "controlplane-operations.additionalRuleLabels.common" . }}
-      {{ include "controlplane-operations.additionalRuleLabels.supportGroupContainers" . }}
+      service: {{ dig "NodeVirtualInterfaceDown" "service" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "NodeVirtualInterfaceDown" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: Interface `{{`{{ $labels.device }}`}}` on `{{`{{ $labels.node }}`}}` is down. Tenant network outage for this node.
       summary: Interface `{{`{{ $labels.device }}`}}` is down. Node network connectivity is degraded.

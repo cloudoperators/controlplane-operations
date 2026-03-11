@@ -11,10 +11,11 @@ groups:
     expr: kubelet_volume_stats_available_percent < 10
     for: {{ dig "KubernetesPVCNoSpaceLeft" "for" "10m" .Values.prometheusRules }}
     labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "KubernetesPVCNoSpaceLeft" "severity" "info" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesPVCNoSpaceLeft.md
-      {{ include "controlplane-operations.additionalRuleLabels.common" . }}
-      {{ include "controlplane-operations.additionalRuleLabels.supportGroupContainers" . }}
+      service: {{ dig "KubernetesPVCNoSpaceLeft" "service" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "KubernetesPVCNoSpaceLeft" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: "The PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` is almost full. Increase or delete files."
       summary: "PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` free space is less than 10%."
@@ -25,10 +26,11 @@ groups:
     expr: kubelet_volume_stats_available_percent < 2
     for: {{ dig "KubernetesPVCNoSpaceLeft" "for" "10m" .Values.prometheusRules }}
     labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "KubernetesPVCNoSpaceLeft" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesPVCNoSpaceLeft.md
-      {{ include "controlplane-operations.additionalRuleLabels.common" . }}
-      {{ include "controlplane-operations.additionalRuleLabels.supportGroupContainers" . }}
+      service: {{ dig "KubernetesPVCNoSpaceLeft" "service" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "KubernetesPVCNoSpaceLeft" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: "The PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` is full. Programs will stop working if relying upon free storage."
       summary: "PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` usage is over 98%."

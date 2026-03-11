@@ -19,12 +19,24 @@ app.kubernetes.io/part-of: {{ $root.Release.Name }}
 {{- end }}
 {{- end }}
 
-{{- define "controlplane-operations.additionalRuleLabels" }}
-{{- if .Values.prometheusRules.additionalRuleLabels }}
-{{- toYaml .Values.prometheusRules.additionalRuleLabels | nindent 6 }}
+{{- define "controlplane-operations.additionalRuleLabels.common" }}
+{{- if .Values.prometheusRules.additionalRuleLabels.common }}
+{{- toYaml .Values.prometheusRules.additionalRuleLabels.common | nindent 6 }}
 {{- end }}
 {{- if .Values.global.commonLabels }}
 {{ tpl (toYaml .Values.global.commonLabels) . }}
+{{- end }}
+{{- end }}
+
+{{- define "controlplane-operations.additionalRuleLabels.supportGroupContainers" }}
+{{- if .Values.prometheusRules.additionalRuleLabels.supportGroupContainers }}
+{{- toYaml .Values.prometheusRules.additionalRuleLabels.supportGroupContainers | nindent 6 }}
+{{- end }}
+{{- end }}
+
+{{- define "controlplane-operations.additionalRuleLabels.supportGroupFoundation" }}
+{{- if .Values.prometheusRules.additionalRuleLabels.supportGroupFoundation }}
+{{- toYaml .Values.prometheusRules.additionalRuleLabels.supportGroupFoundation | nindent 6 }}
 {{- end }}
 {{- end }}
 

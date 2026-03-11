@@ -11,6 +11,7 @@ groups:
       severity: {{ dig "ArgoraUpdateInError" "severity" "warning" .Values.prometheusRules }}
       playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-update-in-error/ #TODO: add playbook
       {{ include "controlplane-operations.additionalRuleLabels" . }}
+      {{ include "controlplane-operations.supportGroupContainers" . }}
     annotations:
       description: "Argora Update CR status is in Error state for more than 10 minutes."
       summary: "Update CR in Error state."
@@ -26,6 +27,7 @@ groups:
       severity: {{ dig "ArgoraClusterImportInError" "severity" "warning" .Values.prometheusRules }}
       playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-clusterimport-in-error/ #TODO: add playbook
       {{ include "controlplane-operations.additionalRuleLabels" . }}
+      {{ include "controlplane-operations.supportGroupContainers" . }}
     annotations:
       description: "Argora ClusterImport CR status is in Error state for more than 10 minutes."
       summary: "ClusterImport CR in Error state."
@@ -40,6 +42,7 @@ groups:
       severity: {{ dig "ArgoraPodNotReadyError" "severity" "warning" .Values.prometheusRules }}
       playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-pod-not-ready/ #TODO: add playbook
       {{ include "controlplane-operations.additionalRuleLabels" . }}
+      {{ include "controlplane-operations.supportGroupContainers" . }}
     annotations:
       description: "Argora Pod is not ready for more than 5 minutes."
       summary: "Pod not ready."
@@ -55,6 +58,7 @@ groups:
       severity: {{ dig "ServerStuckInDiscovery" "severity" "warning" .Values.prometheusRules }}
       playbook: https://operations.global.cloud.sap/docs/support/playbook/server-stuck-in-discovery/ #TODO: add playbook
       {{ include "controlplane-operations.additionalRuleLabels" . }}
+      {{ include "controlplane-operations.supportGroupFoundation" . }}
     annotations:
       description: "Server is stuck in Discovery for more than 15 minutes."
       summary: "Server stuck in Discovery."

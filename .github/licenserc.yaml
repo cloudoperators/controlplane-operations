@@ -1,3 +1,4 @@
+# REUSE-IgnoreStart
 header:
   license:
     spdx-id: Apache-2.0
@@ -5,7 +6,6 @@ header:
       SPDX-FileCopyrightText: [year] SAP SE or an SAP affiliate company and Greenhouse contributors
       SPDX-License-Identifier: Apache-2.0
     pattern: |
-# REUSE-IgnoreStart
       SPDX-FileCopyrightText: [0-9]+ SAP SE or an SAP affiliate company and Greenhouse contributors
       SPDX-License-Identifier: Apache-2\.0
 # REUSE-IgnoreEnd

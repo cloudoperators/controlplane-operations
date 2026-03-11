@@ -26,6 +26,9 @@ prometheusRules:
   ## Annotations for PrometheusRules
   annotations: {}
 
+  ## Default service label for alerts. This is used if no service label is defined for an alert.
+  defaultService: ""
+
   ## Default support group for alerts. This is used if no support group label is defined for an alert.
   defaultSupportGroup: ""
 

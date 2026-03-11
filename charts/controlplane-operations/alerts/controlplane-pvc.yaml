@@ -14,7 +14,7 @@ groups:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "KubernetesPVCNoSpaceLeft" "severity" "info" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesPVCNoSpaceLeft.md
-      service: {{ dig "KubernetesPVCNoSpaceLeft" "service" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      service: {{ dig "KubernetesPVCNoSpaceLeft" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "KubernetesPVCNoSpaceLeft" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: "The PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` is almost full. Increase or delete files."
@@ -29,7 +29,7 @@ groups:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "KubernetesPVCNoSpaceLeft" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesPVCNoSpaceLeft.md
-      service: {{ dig "KubernetesPVCNoSpaceLeft" "service" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      service: {{ dig "KubernetesPVCNoSpaceLeft" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "KubernetesPVCNoSpaceLeft" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: "The PVC `{{`{{ $labels.namespace }}`}}`/`{{`{{ $labels.persistentvolumeclaim }}`}}` is full. Programs will stop working if relying upon free storage."

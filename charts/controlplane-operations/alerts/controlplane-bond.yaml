@@ -9,7 +9,7 @@ groups:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "NodeBondDegradedMain" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeBondDegradedMain.md
-      service: {{ dig "NodeBondDegradedMain" "service" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      service: {{ dig "NodeBondDegradedMain" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "NodeBondDegradedMain" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: Bond `{{`{{ $labels.master }}`}}` on `{{`{{ $labels.node }}`}}` is degraded. Imminent network outage for this node.
@@ -24,7 +24,7 @@ groups:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "NodeVirtualInterfaceDown" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeVirtualInterfaceDown.md
-      service: {{ dig "NodeVirtualInterfaceDown" "service" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      service: {{ dig "NodeVirtualInterfaceDown" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "NodeVirtualInterfaceDown" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: Interface `{{`{{ $labels.device }}`}}` on `{{`{{ $labels.node }}`}}` is down. Tenant network outage for this node.

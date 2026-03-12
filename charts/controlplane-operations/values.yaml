@@ -36,6 +36,9 @@ prometheusRules:
   ## This is useful for adding additional labels of alerts to each rule
   additionalRuleLabels: {}
 
+  ## Additional labels for Gardener related PrometheusRule alerts
+  gardenerRuleLabels: {}
+
   ## Additional annotations for PrometheusRule alerts
   additionalRuleAnnotations: {}
 
@@ -44,10 +47,10 @@ prometheusRules:
   # KubernetesApiServerDown: true
   # KubeletDown: true
 
-  # NodeVirtualInterfaceDown:
-  #   service: "cc-cp"
-  #   supportGroup: "containers"
-  #   for: "15m"
+  # ServerStuckInDiscovery:
+  #   service: "metal-api"
+  #   supportGroup: "foundation"
+  #   for: "10m"
   #   severity: "warning"
 
 ## Create default dashboards for monitoring the cluster

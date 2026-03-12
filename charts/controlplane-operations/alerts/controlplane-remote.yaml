@@ -1,5 +1,5 @@
 groups:
-- name: controlplane-remote.alerts
+- name: controlplane-remote
   rules:
 {{- if not (.Values.prometheusRules.disabled.ArgoraUpdateInError | default false) }}
   - alert: ArgoraUpdateInError

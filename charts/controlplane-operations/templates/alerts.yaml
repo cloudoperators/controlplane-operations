@@ -6,7 +6,6 @@ kind: PrometheusRule
 metadata:
   name: {{ printf "%s-%s" $.Release.Name $path | replace "/" "-" | trimSuffix ".yaml" | trunc 63 }}
   labels:
-    path: {{ $path | trunc 63 | quote }}
 {{ include "controlplane-operations.ruleSelectorLabels" (list $path $root) | indent 4 }}
 {{ include "controlplane-operations.labels" (list $path $root) | indent 4 }}
 {{- if $.Values.prometheusRules.labels }}

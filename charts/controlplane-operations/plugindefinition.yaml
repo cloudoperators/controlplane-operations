@@ -3,7 +3,7 @@ kind: PluginDefinition
 metadata:
   name: controlplane-operations
 spec:
-  version: 1.0.19
+  version: 1.0.20
   displayName: Controlplane operations bundle
   description: Operations bundle for Controlane clusters
   docMarkDownUrl: https://raw.githubusercontent.com/cloudoperators/controlplane-operations/main/README.md
@@ -11,7 +11,7 @@ spec:
   helmChart:
     name: controlplane-operations
     repository: oci://ghcr.io/cloudoperators/controlplane-operations/charts
-    version: 1.0.19
+    version: 1.0.20
   options:
     - name: prometheusRules.create
       description: Create Prometheus rules
@@ -24,6 +24,10 @@ spec:
       type: list
     - name: prometheusRules.additionalRuleLabels
       description: Additional labels to be added every Prometheus rule. E.g support_group, service
+      required: false
+      type: map
+    - name: prometheusRules.gardenerRuleLabels
+      description: Labels for Gardener-specific Prometheus rules
       required: false
       type: map
     - name: dashboards.create

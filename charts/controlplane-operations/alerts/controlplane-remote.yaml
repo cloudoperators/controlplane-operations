@@ -12,7 +12,7 @@ groups:
       severity: {{ dig "ArgoraUpdateInError" "severity" "warning" .Values.prometheusRules }}
       playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-update-in-error/ #TODO: add playbook
       service: {{ dig "ArgoraUpdateInError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
-      support_group: {{ dig "ArgoraUpdateInError" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "ArgoraUpdateInError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: "Argora Update CR status is in Error state for more than 10 minutes."
       summary: "Update CR in Error state."
@@ -29,7 +29,7 @@ groups:
       severity: {{ dig "ArgoraClusterImportInError" "severity" "warning" .Values.prometheusRules }}
       playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-clusterimport-in-error/ #TODO: add playbook
       service: {{ dig "ArgoraClusterImportInError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
-      support_group: {{ dig "ArgoraClusterImportInError" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "ArgoraClusterImportInError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: "Argora ClusterImport CR status is in Error state for more than 10 minutes."
       summary: "ClusterImport CR in Error state."
@@ -45,7 +45,7 @@ groups:
       severity: {{ dig "ArgoraPodNotReadyError" "severity" "warning" .Values.prometheusRules }}
       playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-pod-not-ready/ #TODO: add playbook
       service: {{ dig "ArgoraPodNotReadyError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
-      support_group: {{ dig "ArgoraPodNotReadyError" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "ArgoraPodNotReadyError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: "Argora Pod is not ready for more than 5 minutes."
       summary: "Pod not ready."
@@ -62,7 +62,7 @@ groups:
       severity: {{ dig "ServerStuckInDiscovery" "severity" "warning" .Values.prometheusRules }}
       playbook: https://operations.global.cloud.sap/docs/support/playbook/server-stuck-in-discovery/ #TODO: add playbook
       service: {{ dig "ServerStuckInDiscovery" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
-      support_group: {{ dig "ServerStuckInDiscovery" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "ServerStuckInDiscovery" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: "Server is stuck in Discovery for more than 15 minutes."
       summary: "Server stuck in Discovery."

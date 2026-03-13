@@ -10,7 +10,7 @@ groups:
       severity: {{ dig "KubernetesNodeBridgeFilterVLANTagged" "severity" "info" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesNodeBridgeFilterVLANTagged.md
       service: {{ dig "KubernetesNodeBridgeFilterVLANTagged" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
-      support_group: {{ dig "KubernetesNodeBridgeFilterVLANTagged" "supportGroup" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "KubernetesNodeBridgeFilterVLANTagged" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: VLAN-tagged ARP/IP traffic is filtered by ARPtables/IPtables on `{{`{{ $labels.node }}`}}`. Network datapath threatened!
       summary: Bridged VLAN-tagged traffic is filtered by IPtables.

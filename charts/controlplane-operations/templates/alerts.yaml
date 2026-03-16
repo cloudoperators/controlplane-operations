@@ -11,7 +11,10 @@ metadata:
 {{- if $.Values.prometheusRules.labels }}
 {{ toYaml $.Values.prometheusRules.labels | indent 4 }}
 {{- end }}
-  path: {{ printf "%s" $path }}
+    path: {{ printf "%s" $path }}
+{{- if and $.Values.prometheusRules.gardenerRuleLabels (hasSuffix "gardener.yaml" $path) }}
+{{ toYaml $.Values.prometheusRules.gardenerRuleLabels | indent 4 }}
+{{- end }}
 {{- if $.Values.prometheusRules.annotations }}
   annotations:
 {{ toYaml $.Values.prometheusRules.annotations | indent 4 }}

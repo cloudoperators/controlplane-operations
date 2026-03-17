@@ -47,6 +47,9 @@ prometheusRules:
   # KubernetesApiServerDown: true
   # KubeletDown: true
 
+  calico:
+    bgpNeighborCount: 2
+
   # ServerStuckInDiscovery:
   #   service: "metal-api"
   #   supportGroup: "foundation"

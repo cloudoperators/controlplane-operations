@@ -7,7 +7,7 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.ShootUnavailability | default false) }}
   - alert: ShootUnavailability
     expr: shoot:availability == 0
-    for: {{ dig "ShootUnavailability" "for" "5m" .Values.prometheusRules }}
+    for: {{ dig "ShootUnavailability" "for" "15m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ShootUnavailability" "severity" "warning" .Values.prometheusRules }}

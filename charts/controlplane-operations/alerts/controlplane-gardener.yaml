@@ -15,8 +15,8 @@ groups:
       service: {{ dig "ShootUnavailability" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ShootUnavailability" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: Shoot cluster(s) unavailability for more than 5 minutes.
-      summary: Shoot cluster(s) unavailability for more than 5 minutes.
+      description: Shoot cluster(s) unavailability detected. Need manual investigation of the root cause. Check the shoot cluster(s) and underlying infrastructure for issues.
+      summary: Shoot cluster(s) unavailability detected.
 {{- end }}
 
 ### Calico ###

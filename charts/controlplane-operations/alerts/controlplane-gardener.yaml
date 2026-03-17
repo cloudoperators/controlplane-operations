@@ -7,11 +7,26 @@ groups:
     for: {{ dig "ShootUnavailability" "for" "10m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
-      severity: {{ dig "ShootUnavailability" "severity" "info" .Values.prometheusRules }}
+      severity: {{ dig "ShootUnavailability" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootUnavailability.md
       service: {{ dig "ShootUnavailability" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ShootUnavailability" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: Shoot cluster is unavailable for more than 10 minutes.
       summary: Shoot cluster is unavailable for more than 10 minutes.
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.CalicoBirdDown | default false) }}
+  - alert: CalicoBirdDown
+    expr: bird_protocol_up{import_filter="ACCEPT",ip_version="4",proto="BGP",state!="Passive"} == 0
+    for: {{ dig "CalicoBirdDown" "for" "5m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "CalicoBirdDown" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoBirdDown.md
+      service: {{ dig "CalicoBirdDown" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "CalicoBirdDown" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: Calico Bird is down for more than 5 minutes.
+      summary: Calico Bird is down for more than 5 minutes.
 {{- end }}

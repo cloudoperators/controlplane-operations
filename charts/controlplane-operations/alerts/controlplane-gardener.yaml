@@ -1,17 +1,82 @@
 groups:
 - name: controlplane-gardener
   rules:
+
+### Gardener ###
+
 {{- if not (.Values.prometheusRules.disabled.ShootUnavailability | default false) }}
   - alert: ShootUnavailability
     expr: shoot:availability == 0
-    for: {{ dig "ShootUnavailability" "for" "10m" .Values.prometheusRules }}
+    for: {{ dig "ShootUnavailability" "for" "15m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
-      severity: {{ dig "ShootUnavailability" "severity" "info" .Values.prometheusRules }}
+      severity: {{ dig "ShootUnavailability" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootUnavailability.md
       service: {{ dig "ShootUnavailability" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ShootUnavailability" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: Shoot cluster is unavailable for more than 10 minutes.
-      summary: Shoot cluster is unavailable for more than 10 minutes.
+      description: Shoot cluster(s) unavailability detected. Need manual investigation of the root cause. Check the shoot cluster(s) and underlying infrastructure for issues.
+      summary: Shoot cluster(s) unavailability detected.
+{{- end }}
+
+### Calico ###
+
+{{- if not (.Values.prometheusRules.disabled.CalicoBgpNeighborSessionDown | default false) }}
+  - alert: CalicoBgpNeighborSessionDown
+    expr: sum by (node) (bird_protocol_up{proto="BGP",state="Established"}) < {{ .Values.prometheusRules.calico.bgpNeighborCount }}
+    for: {{ dig "CalicoBgpNeighborSessionDown" "for" "30m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "CalicoBgpNeighborSessionDown" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoBgpNeighborSessionDown.md
+      service: {{ dig "CalicoBgpNeighborSessionDown" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "CalicoBgpNeighborSessionDown" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: Node has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors. BGP peer is not established. Network datapath threatened! Switch upgrades or misconfiguration?
+      summary: Node has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors.
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.CalicoBgpNeighborSessionAllDown | default false) }}
+  - alert: CalicoBgpNeighborSessionAllDown
+    expr: sum by (node) (bird_protocol_up{proto="BGP",state="Established"}) == 0
+    for: {{ dig "CalicoBgpNeighborSessionAllDown" "for" "10m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "CalicoBgpNeighborSessionAllDown" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoBgpNeighborSessionAllDown.md
+      service: {{ dig "CalicoBgpNeighborSessionAllDown" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "CalicoBgpNeighborSessionAllDown" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+        description: Node has no BGP neighbors. Network datapath is down! Switch upgrades or misconfiguration?
+        summary: Node has no BGP neighbors.
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.CalicoNodeMissing | default false) }}
+  - alert: CalicoNodeMissing
+    expr: count(up{job="kube-kubelet"} == 1) > count(_pod_to_daemonset{owner_name="calico-node"} == 1)
+    for: {{ dig "CalicoNodeMissing" "for" "30m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "CalicoNodeMissing" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoNodeMissing.md
+      service: {{ dig "CalicoNodeMissing" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "CalicoNodeMissing" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+        description: Calico is not running on all nodes.
+        summary: Calico is not running on all bare metal nodes. Network datapath threatened!
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.CalicoNodeNotReady | default false) }}
+  - alert: CalicoNodeNotReady
+    expr: kube_pod_status_ready{namespace="kube-system",pod=~"calico-node-[a-zA-Z0-9]{5}",condition="false",type="shoot"} == 1
+    for: {{ dig "CalicoNodeNotReady" "for" "30m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "CalicoNodeNotReady" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoNodeNotReady.md
+      service: {{ dig "CalicoNodeNotReady" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "CalicoNodeNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: Calico-Node Pod is not Ready on all nodes.
+      summary: Calico-Node is not healthy on all bare metal nodes that are Ready. Risk of stale BGP advertisement. Network datapath threatened!
 {{- end }}

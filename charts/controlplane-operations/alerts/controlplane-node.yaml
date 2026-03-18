@@ -27,6 +27,6 @@ groups:
       service: {{ dig "KubernetesNodeKCPNotReady" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "KubernetesNodeKCPNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: KCP node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} is not ready. Check node conditions and events for more details.
-      summary: KCP node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} is not ready.
+      description: KCP node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} is not Ready. Check node conditions and events for more details.
+      summary: KCP node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} is not Ready.
 {{- end }}

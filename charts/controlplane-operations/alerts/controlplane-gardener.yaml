@@ -6,7 +6,7 @@ groups:
 
 {{- if not (.Values.prometheusRules.disabled.ShootUnavailability | default false) }}
   - alert: ShootUnavailability
-    expr: shoot:availability == 0
+    expr: shoot:availability{instance=~"https:\\/\\/api\\..+",container=""} == 0
     for: {{ dig "ShootUnavailability" "for" "15m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
@@ -15,8 +15,8 @@ groups:
       service: {{ dig "ShootUnavailability" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ShootUnavailability" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: Shoot cluster(s) unavailability detected. Need manual investigation of the root cause. Check the shoot cluster(s) and underlying infrastructure for issues.
-      summary: Shoot cluster(s) unavailability detected.
+      description: Shoot {{`{{ $labels.shoot_name }}`}} is unavailable. Need manual investigation of the root cause. Check the shoot and underlying infrastructure for issues.
+      summary: Shoot {{`{{ $labels.shoot_name }}`}} is unavailable.
 {{- end }}
 
 ### Calico ###
@@ -32,8 +32,8 @@ groups:
       service: {{ dig "CalicoBgpNeighborSessionDown" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "CalicoBgpNeighborSessionDown" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: Node has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors. BGP peer is not established. Network datapath threatened! Switch upgrades or misconfiguration?
-      summary: Node has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors.
+      description: Node {{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors. BGP peer is not established. Network datapath threatened! Switch upgrades or misconfiguration?
+      summary: Node {{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.CalicoBgpNeighborSessionAllDown | default false) }}
@@ -47,8 +47,8 @@ groups:
       service: {{ dig "CalicoBgpNeighborSessionAllDown" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "CalicoBgpNeighborSessionAllDown" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-        description: Node has no BGP neighbors. Network datapath is down! Switch upgrades or misconfiguration?
-        summary: Node has no BGP neighbors.
+        description: Node {{`{{ $labels.node }}`}} has no BGP neighbors. Network datapath is down! Switch upgrades or misconfiguration?
+        summary: Node {{`{{ $labels.node }}`}} has no BGP neighbors.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.CalicoNodeMissing | default false) }}
@@ -62,8 +62,8 @@ groups:
       service: {{ dig "CalicoNodeMissing" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "CalicoNodeMissing" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-        description: Calico is not running on all nodes.
-        summary: Calico is not running on all bare metal nodes. Network datapath threatened!
+        description: Calico is not running on all bare metal nodes. Network datapath threatened!
+        summary: Calico is not running on all nodes.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.CalicoNodeNotReady | default false) }}
@@ -77,6 +77,6 @@ groups:
       service: {{ dig "CalicoNodeNotReady" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "CalicoNodeNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: Calico-Node Pod is not Ready on all nodes.
-      summary: Calico-Node is not healthy on all bare metal nodes that are Ready. Risk of stale BGP advertisement. Network datapath threatened!
+      description: Calico-Node Pod {{`{{ $labels.pod }}`}} on shoot {{`{{ $labels.shoot_name }}`}} is not Ready. Network datapath threatened!
+      summary: Calico-Node Pod {{`{{ $labels.pod }}`}} on shoot {{`{{ $labels.shoot_name }}`}} is not Ready.
 {{- end }}

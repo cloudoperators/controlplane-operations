@@ -15,3 +15,18 @@ groups:
       description: VLAN-tagged ARP/IP traffic is filtered by ARPtables/IPtables on `{{`{{ $labels.node }}`}}`. Network datapath threatened!
       summary: Bridged VLAN-tagged traffic is filtered by IPtables.
 {{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.KubernetesNodeKCPNotReady | default false) }}
+  - alert: KubernetesNodeKCPNotReady
+    expr: kube_node_status_condition{condition="Ready",node=~"kcp-.+",status="false"} == 1
+    for: {{ dig "KubernetesNodeKCPNotReady" "for" "30m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "KubernetesNodeKCPNotReady" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesNodeKCPNotReady.md
+      service: {{ dig "KubernetesNodeKCPNotReady" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "KubernetesNodeKCPNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: KCP node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} is not Ready. Check node conditions and events for more details.
+      summary: KCP node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} is not Ready.
+{{- end }}

@@ -4,19 +4,49 @@ groups:
 
 ### Gardener ###
 
-{{- if not (.Values.prometheusRules.disabled.ShootUnavailability | default false) }}
-  - alert: ShootUnavailability
-    expr: shoot:availability{instance=~"https:\\/\\/api\\..+",container=""} == 0
-    for: {{ dig "ShootUnavailability" "for" "15m" .Values.prometheusRules }}
+{{- if not (.Values.prometheusRules.disabled.ShootReconciliationFailed | default false) }}
+  - alert: ShootReconciliationFailed
+    expr: garden_shoot_operation_states{operation="Reconcile"} != 1
+    for: {{ dig "ShootReconciliationFailed" "for" "30m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
-      severity: {{ dig "ShootUnavailability" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootUnavailability.md
-      service: {{ dig "ShootUnavailability" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
-      support_group: {{ dig "ShootUnavailability" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      severity: {{ dig "ShootReconciliationFailed" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootReconciliationFailed.md
+      service: {{ dig "ShootReconciliationFailed" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "ShootReconciliationFailed" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: Shoot {{`{{ $labels.shoot_name }}`}} is unavailable. Need manual investigation of the root cause. Check the shoot and underlying infrastructure for issues.
-      summary: Shoot {{`{{ $labels.shoot_name }}`}} is unavailable.
+      description: Shoot {{`{{ $labels.name }}`}} is not being reconciled successfully. Check the shoot's conditions and events for more details.
+      summary: Shoot {{`{{ $labels.name }}`}} is not being reconciled successfully.
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.ShootConditionNotTrue | default false) }}
+  - alert: ShootConditionNotTrue
+    expr: max by(name) (garden_shoot_condition != 1)
+    for: {{ dig "ShootConditionNotTrue" "for" "30m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "ShootConditionNotTrue" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootConditionNotTrue.md
+      service: {{ dig "ShootConditionNotTrue" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "ShootConditionNotTrue" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: Shoot {{`{{ $labels.name }}`}} has a condition that is not True. Check the shoot's conditions and events for more details.
+      summary: Shoot {{`{{ $labels.name }}`}} has a condition that is not True.
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.SeedConditionNotTrue | default false) }}
+  - alert: SeedConditionNotTrue
+    expr: max by(name) (garden_seed_condition != 1)
+    for: {{ dig "SeedConditionNotTrue" "for" "30m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "SeedConditionNotTrue" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/SeedConditionNotTrue.md
+      service: {{ dig "SeedConditionNotTrue" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "SeedConditionNotTrue" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: Seed {{`{{ $labels.name }}`}} has a condition that is not True. Check the seed's conditions and events for more details.
+      summary: Seed {{`{{ $labels.name }}`}} has a condition that is not True.
 {{- end }}
 
 ### Calico ###

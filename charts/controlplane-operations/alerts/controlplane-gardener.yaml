@@ -49,6 +49,21 @@ groups:
       summary: Seed {{`{{ $labels.name }}`}} has a condition that is not True.
 {{- end }}
 
+{{- if not (.Values.prometheusRules.disabled.GardenletNotReady | default false) }}
+  - alert: GardenletNotReady
+    expr: garden_garden_condition{status="True"} != 1
+    for: {{ dig "GardenletNotReady" "for" "30m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "GardenletNotReady" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/GardenletNotReady.md
+      service: {{ dig "GardenletNotReady" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "GardenletNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: Gardenlet on {{`{{ $labels.landscape }}`}} is not Ready. Check the gardenlet's conditions and events for more details.
+      summary: Gardenlet on {{`{{ $labels.landscape }}`}} is not Ready.
+{{- end }}
+
 ### Calico ###
 
 {{- if not (.Values.prometheusRules.disabled.CalicoBgpNeighborSessionDown | default false) }}

@@ -38,3 +38,23 @@ plugin: {{ $root.Release.Name }}
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- define "controlplane-operations.supportService" }}
+{{- if eq "cp" . }}
+{{- "cc-cp" }}
+{{- else if eq "compute" . }}
+{{- "metal-api" }}
+{{- else if eq "storage" . }}
+{{- "ceph" }}
+{{- end }}
+{{- end }}
+
+{{- define "controlplane-operations.supportGroup" }}
+{{- if eq "cp" . }}
+{{- "containers" }}
+{{- else if eq "compute" . }}
+{{- "compute" }}
+{{- else if eq "storage" . }}
+{{- "storage" }}
+{{- end }}
+{{- end }}

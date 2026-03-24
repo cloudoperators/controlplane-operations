@@ -11,8 +11,8 @@ groups:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ShootReconciliationFailed" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootReconciliationFailed.md
-      service: {{ dig "ShootReconciliationFailed" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
-      support_group: {{ dig "ShootReconciliationFailed" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      service: {{ include "controlplane-operations.supportService" "`{{ $labels.project }}`" | default (dig "ShootReconciliationFailed" "service" .Values.prometheusRules.defaultService .Values.prometheusRules) }}
+      support_group: {{ include "controlplane-operations.supportGroup" "`{{ $labels.project }}`" | default (dig "ShootReconciliationFailed" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules) }}
     annotations:
       description: Shoot {{`{{ $labels.name }}`}} from project {{`{{ $labels.project }}`}} on {{`{{ $labels.landscape }}`}} is not being reconciled successfully for {{ dig "ShootReconciliationFailed" "for" "30m" .Values.prometheusRules }} minutes. Check the shoot's conditions and events for more details.
       summary: Shoot {{`{{ $labels.name }}`}} from project {{`{{ $labels.project }}`}} on {{`{{ $labels.landscape }}`}} is not being reconciled successfully.
@@ -26,8 +26,8 @@ groups:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ShootConditionNotTrue" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootConditionNotTrue.md
-      service: {{ dig "ShootConditionNotTrue" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
-      support_group: {{ dig "ShootConditionNotTrue" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      service: {{ include "controlplane-operations.supportService" "`{{ $labels.project }}`" | default (dig "ShootConditionNotTrue" "service" .Values.prometheusRules.defaultService .Values.prometheusRules) }}
+      support_group: {{ include "controlplane-operations.supportGroup" "`{{ $labels.project }}`" | default (dig "ShootConditionNotTrue" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules) }}
     annotations:
       description: Shoot {{`{{ $labels.name }}`}} of project {{`{{ $labels.project }}`}} seeded from {{`{{ $labels.landscape }}`}}/{{`{{ $labels.seed }}`}} has a condition that is not True. Check the Shoot's conditions and events for more details.
       summary: Shoot {{`{{ $labels.name }}`}} of project {{`{{ $labels.project }}`}} seeded from {{`{{ $labels.landscape }}`}}/{{`{{ $labels.seed }}`}} has a condition that is not True.

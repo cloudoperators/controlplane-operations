@@ -38,13 +38,3 @@ plugin: {{ $root.Release.Name }}
 {{- end }}
 {{- end }}
 {{- end }}
-
-{{- define "controlplane-operations.supportGroup" }}
-{{- if eq "cp" . }}
-{{- "containers" }}
-{{- else if eq "compute" . }}
-{{- "compute" }}
-{{- else if eq "storage" . }}
-{{- "storage" }}
-{{- end }}
-{{- end }}

@@ -42,7 +42,7 @@ groups:
       severity: {{ dig "ShootReconciliationFailed" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootReconciliationFailed.md
       service: gardener
-      support_group: {{`{{ $labels.support_group }}`}}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
       description: Shoot {{`{{ $labels.name }}`}} from project {{`{{ $labels.project }}`}} on {{`{{ $labels.landscape }}`}} is not being reconciled successfully for {{ dig "ShootReconciliationFailed" "for" "30m" .Values.prometheusRules }} minutes. Check the shoot's conditions and events for more details.
       summary: Shoot {{`{{ $labels.name }}`}} from project {{`{{ $labels.project }}`}} on {{`{{ $labels.landscape }}`}} is not being reconciled successfully.
@@ -71,7 +71,7 @@ groups:
       severity: {{ dig "ShootConditionNotTrue" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootConditionNotTrue.md
       service: gardener
-      support_group: {{`{{ $labels.support_group }}`}}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
       description: Shoot {{`{{ $labels.name }}`}} of project {{`{{ $labels.project }}`}} seeded from {{`{{ $labels.landscape }}`}}/{{`{{ $labels.seed }}`}} has a condition that is not True. Check the Shoot's conditions and events for more details.
       summary: Shoot {{`{{ $labels.name }}`}} of project {{`{{ $labels.project }}`}} seeded from {{`{{ $labels.landscape }}`}}/{{`{{ $labels.seed }}`}} has a condition that is not True.
@@ -100,7 +100,7 @@ groups:
       severity: {{ dig "SeedConditionNotTrue" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/SeedConditionNotTrue.md
       service: gardener
-      support_group: {{`{{ $labels.support_group }}`}}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
       description: Seed {{`{{ $labels.name }}`}} on {{`{{ $labels.landscape }}`}} has a condition that is not True. Check the Seed's conditions and events for more details.
       summary: Seed {{`{{ $labels.name }}`}} on {{`{{ $labels.landscape }}`}} has a condition that is not True.
@@ -146,7 +146,7 @@ groups:
       severity: {{ dig "CalicoBgpNeighborSessionDown" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoBgpNeighborSessionDown.md
       service: calico
-      support_group: {{`{{ $labels.support_group }}`}}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
       description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors. BGP peer is not established. Network datapath threatened! Switch upgrades or misconfiguration?
       summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors.
@@ -174,7 +174,7 @@ groups:
       severity: {{ dig "CalicoBgpNeighborSessionAllDown" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoBgpNeighborSessionAllDown.md
       service: calico
-      support_group: {{`{{ $labels.support_group }}`}}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
         description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has no BGP neighbors. Network datapath is down! Switch upgrades or misconfiguration?
         summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has no BGP neighbors.
@@ -219,7 +219,7 @@ groups:
       severity: {{ dig "CalicoNodeNotReady" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoNodeNotReady.md
       service: calico
-      support_group: {{`{{ $labels.support_group }}`}}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
       description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot {{`{{ $labels.shoot_name }}`}} is not Ready. Network datapath threatened!
       summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot {{`{{ $labels.shoot_name }}`}} is not Ready.

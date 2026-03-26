@@ -85,7 +85,7 @@ groups:
           label_replace(
             label_replace(
               label_replace(
-                garden_shoot_condition,
+                garden_shoot_condition{is_seed="true"},
                 "support_group", "containers", "__name__", ".*"
               ),
               "support_group", "storage", "project", "^storage$"

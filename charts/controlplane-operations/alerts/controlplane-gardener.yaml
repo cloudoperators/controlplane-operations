@@ -6,13 +6,43 @@ groups:
 
 {{- if not (.Values.prometheusRules.disabled.ShootReconciliationFailed | default false) }}
   - alert: ShootReconciliationFailed
-    expr: min_over_time((garden_shoot_operation_states{operation="Reconcile"} != 1 or garden_shoot_operation_states{operation="Reconcile"} != 2)[{{ dig "ShootReconciliationFailed" "for" "30m" .Values.prometheusRules }}:]) != 1
+    expr: >
+      min_over_time(
+      (
+        (
+          label_replace(
+            label_replace(
+              label_replace(
+                garden_shoot_operation_states{operation="Reconcile"},
+                "support_group","containers","__name__",".*"
+              ),
+              "support_group","storage","project","^storage$"
+            ),
+            "support_group","compute","project","^compute$"
+          ) != 1
+        )
+        OR
+        (
+          label_replace(
+            label_replace(
+              label_replace(
+                garden_shoot_operation_states{operation="Reconcile"},
+                "support_group","containers","__name__",".*"
+              ),
+              "support_group","storage","project","^storage$"
+            ),
+            "support_group","compute","project","^compute$"
+          ) != 2
+        )
+      )
+      [{{ dig "ShootReconciliationFailed" "for" "30m" .Values.prometheusRules }}:]
+      ) != 1
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ShootReconciliationFailed" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootReconciliationFailed.md
       service: gardener
-      support_group: {{ dig "ShootReconciliationFailed" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules) }}
+      support_group: {{`{{ $labels.support_group }}`}}
     annotations:
       description: Shoot {{`{{ $labels.name }}`}} from project {{`{{ $labels.project }}`}} on {{`{{ $labels.landscape }}`}} is not being reconciled successfully for {{ dig "ShootReconciliationFailed" "for" "30m" .Values.prometheusRules }} minutes. Check the shoot's conditions and events for more details.
       summary: Shoot {{`{{ $labels.name }}`}} from project {{`{{ $labels.project }}`}} on {{`{{ $labels.landscape }}`}} is not being reconciled successfully.
@@ -20,14 +50,28 @@ groups:
 
 {{- if not (.Values.prometheusRules.disabled.ShootConditionNotTrue | default false) }}
   - alert: ShootConditionNotTrue
-    expr: max by(project,landscape,seed,name) (garden_shoot_condition != 1)
+    expr: >
+      max by (project, landscape, seed, name, support_group) (
+        (
+          label_replace(
+            label_replace(
+              label_replace(
+                garden_shoot_condition,
+                "support_group", "containers", "__name__", ".*"
+              ),
+              "support_group", "storage", "project", "^storage$"
+            ),
+            "support_group", "compute", "project", "^compute$"
+          )
+        ) != 1
+      )
     for: {{ dig "ShootConditionNotTrue" "for" "30m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ShootConditionNotTrue" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootConditionNotTrue.md
       service: gardener
-      support_group: {{ dig "ShootConditionNotTrue" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{`{{ $labels.support_group }}`}}
     annotations:
       description: Shoot {{`{{ $labels.name }}`}} of project {{`{{ $labels.project }}`}} seeded from {{`{{ $labels.landscape }}`}}/{{`{{ $labels.seed }}`}} has a condition that is not True. Check the Shoot's conditions and events for more details.
       summary: Shoot {{`{{ $labels.name }}`}} of project {{`{{ $labels.project }}`}} seeded from {{`{{ $labels.landscape }}`}}/{{`{{ $labels.seed }}`}} has a condition that is not True.
@@ -35,29 +79,43 @@ groups:
 
 {{- if not (.Values.prometheusRules.disabled.SeedConditionNotTrue | default false) }}
   - alert: SeedConditionNotTrue
-    expr: max by(landscape,name) (garden_seed_condition != 1)
+    expr: >
+      max by (landscape, name, support_group) (
+        (
+          label_replace(
+            label_replace(
+              label_replace(
+                garden_shoot_condition,
+                "support_group", "containers", "__name__", ".*"
+              ),
+              "support_group", "storage", "project", "^storage$"
+            ),
+            "support_group", "compute", "project", "^compute$"
+          )
+        ) != 1
+      )
     for: {{ dig "SeedConditionNotTrue" "for" "30m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "SeedConditionNotTrue" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/SeedConditionNotTrue.md
       service: gardener
-      support_group: {{ dig "SeedConditionNotTrue" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{`{{ $labels.support_group }}`}}
     annotations:
       description: Seed {{`{{ $labels.name }}`}} on {{`{{ $labels.landscape }}`}} has a condition that is not True. Check the Seed's conditions and events for more details.
       summary: Seed {{`{{ $labels.name }}`}} on {{`{{ $labels.landscape }}`}} has a condition that is not True.
 {{- end }}
 
-{{- if not (.Values.prometheusRules.disabled.GardenletNotReady | default false) }}
-  - alert: GardenletNotReady
+{{- if not (.Values.prometheusRules.disabled.GardenNotReady | default false) }}
+  - alert: GardenNotReady
     expr: max by(landscape) (garden_garden_condition{status="True"}) != 1
-    for: {{ dig "GardenletNotReady" "for" "30m" .Values.prometheusRules }}
+    for: {{ dig "GardenNotReady" "for" "30m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
-      severity: {{ dig "GardenletNotReady" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/GardenletNotReady.md
+      severity: {{ dig "GardenNotReady" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/GardenNotReady.md
       service: gardener
-      support_group: {{ dig "GardenletNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{ dig "GardenNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: Gardenlet on {{`{{ $labels.landscape }}`}} is not Ready. Check the Gardenlet's conditions and events for more details.
       summary: Gardenlet on {{`{{ $labels.landscape }}`}} is not Ready.
@@ -67,37 +125,64 @@ groups:
 
 {{- if not (.Values.prometheusRules.disabled.CalicoBgpNeighborSessionDown | default false) }}
   - alert: CalicoBgpNeighborSessionDown
-    expr: sum by (cluster,node,pod) (bird_protocol_up{proto="BGP",state="Established"}) < {{ .Values.prometheusRules.calico.bgpNeighborCount }}
+    expr: >
+      sum by (cluster, node, pod, support_group) (
+        label_replace(
+          label_replace(
+            label_replace(
+              bird_protocol_up{proto="BGP", state="Established"},
+              "support_group", "containers", "__name__", ".*"
+            ),
+            "support_group", "storage", "project", "^storage$"
+          ),
+          "support_group", "compute", "project", "^compute$"
+        )
+      )
+      <
+      {{ .Values.prometheusRules.calico.bgpNeighborCount }}
     for: {{ dig "CalicoBgpNeighborSessionDown" "for" "30m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "CalicoBgpNeighborSessionDown" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoBgpNeighborSessionDown.md
       service: calico
-      support_group: {{ dig "CalicoBgpNeighborSessionDown" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{`{{ $labels.support_group }}`}}
     annotations:
-      description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{`{{ trimPrefix "shoot--cp--" $labels.cluster }}`}}/{{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors. BGP peer is not established. Network datapath threatened! Switch upgrades or misconfiguration?
-      summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{`{{ trimPrefix "shoot--cp--" $labels.cluster }}`}}/{{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors.
+      description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors. BGP peer is not established. Network datapath threatened! Switch upgrades or misconfiguration?
+      summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.CalicoBgpNeighborSessionAllDown | default false) }}
   - alert: CalicoBgpNeighborSessionAllDown
-    expr: sum by (cluster,node,pod) (bird_protocol_up{proto="BGP",state="Established"}) == 0
+    expr: >
+      sum by (cluster, node, pod, support_group) (
+        label_replace(
+          label_replace(
+            label_replace(
+              bird_protocol_up{proto="BGP", state="Established"},
+              "support_group", "containers", "__name__", ".*"
+            ),
+            "support_group", "storage", "project", "^storage$"
+          ),
+          "support_group", "compute", "project", "^compute$"
+        )
+      )
+      == 0
     for: {{ dig "CalicoBgpNeighborSessionAllDown" "for" "10m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "CalicoBgpNeighborSessionAllDown" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoBgpNeighborSessionAllDown.md
       service: calico
-      support_group: {{ dig "CalicoBgpNeighborSessionAllDown" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{`{{ $labels.support_group }}`}}
     annotations:
-        description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{`{{ trimPrefix "shoot--cp--" $labels.cluster }}`}}/{{`{{ $labels.node }}`}} has no BGP neighbors. Network datapath is down! Switch upgrades or misconfiguration?
-        summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{`{{ trimPrefix "shoot--cp--" $labels.cluster }}`}}/{{`{{ $labels.node }}`}} has no BGP neighbors.
+        description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has no BGP neighbors. Network datapath is down! Switch upgrades or misconfiguration?
+        summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has no BGP neighbors.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.CalicoNodeMissing | default false) }}
   - alert: CalicoNodeMissing
-    expr: count(up{job="kube-kubelet"} == 1) > count(_pod_to_daemonset{owner_name="calico-node"} == 1)
+    expr: count(up{job="kubelet"}) > count(_pod_to_daemonset{owner_name="calico-node"} == 1)
     for: {{ dig "CalicoNodeMissing" "for" "30m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
@@ -112,14 +197,29 @@ groups:
 
 {{- if not (.Values.prometheusRules.disabled.CalicoNodeNotReady | default false) }}
   - alert: CalicoNodeNotReady
-    expr: kube_pod_status_ready{namespace="kube-system",pod=~"calico-node-[a-zA-Z0-9]{5}",condition="false",type="shoot"} == 1
+    expr: >
+      label_replace(
+        label_replace(
+          label_replace(
+            kube_pod_status_ready{
+              namespace = "kube-system",
+              pod       =~ "calico-node-[a-zA-Z0-9]{5}",
+              condition = "false",
+              type      = "shoot"
+            },
+            "support_group", "containers", "__name__", ".*"
+          ),
+          "support_group", "storage", "project", "^storage$"
+        ),
+        "support_group", "compute", "project", "^compute$"
+      ) == 1
     for: {{ dig "CalicoNodeNotReady" "for" "30m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "CalicoNodeNotReady" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoNodeNotReady.md
       service: calico
-      support_group: {{ dig "CalicoNodeNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: {{`{{ $labels.support_group }}`}}
     annotations:
       description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot {{`{{ $labels.shoot_name }}`}} is not Ready. Network datapath threatened!
       summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot {{`{{ $labels.shoot_name }}`}} is not Ready.

@@ -230,14 +230,19 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.MCMMachineNotReady | default false) }}
   - alert: MCMMachineNotReady
     expr: >
-      sum by (name, shoot) (
+      sum by (name, project, shoot_name, support_group) (
         label_replace(
-          mcm_machine_status_condition{
-            job="machine-controller-manager",
-            condition="Ready"
-          },
-          "shoot", "$1",
-          "namespace", "shoot--cp--(.*)"
+          label_replace(
+            label_replace(
+              mcm_machine_status_condition{
+                job="machine-controller-manager",
+                condition="Ready"
+              },
+              "support_group", "containers", "__name__", ".*"
+            ),
+            "support_group", "storage", "project", "^storage$"
+          ),
+          "support_group", "compute", "project", "^compute$"
         )
       ) == 0
     for: {{ dig "MCMMachineNotReady" "for" "30m" .Values.prometheusRules }}
@@ -246,22 +251,27 @@ groups:
       severity: {{ dig "MCMMachineNotReady" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineNotReady.md
       service: gardener
-      support_group: {{ dig "MCMMachineNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is not Ready. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is not Ready.
+      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is not Ready. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is not Ready.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.MCMMachineStuckInTerminating | default false) }}
   - alert: MCMMachineStuckInTerminating
     expr: >
-      sum by (name, shoot) (
+      sum by (name, project, shoot_name, support_group) (
         label_replace(
-          mcm_machine_current_status_phase{
-            job="machine-controller-manager",
-          },
-          "shoot", "$1",
-          "namespace", "shoot--cp--(.*)"
+          label_replace(
+            label_replace(
+              mcm_machine_current_status_phase{
+                job="machine-controller-manager",
+              },
+              "support_group", "containers", "__name__", ".*"
+            ),
+            "support_group", "storage", "project", "^storage$"
+          ),
+          "support_group", "compute", "project", "^compute$"
         )
       ) == -4
     for: {{ dig "MCMMachineStuckInTerminating" "for" "30m" .Values.prometheusRules }}
@@ -270,22 +280,27 @@ groups:
       severity: {{ dig "MCMMachineStuckInTerminating" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineStuckInTerminating.md
       service: gardener
-      support_group: {{ dig "MCMMachineStuckInTerminating" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is stuck in Terminating state. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is stuck in Terminating state.
+      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Terminating state. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Terminating state.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.MCMMachineFailed | default false) }}
   - alert: MCMMachineFailed
     expr: >
-      sum by (name, shoot) (
+      sum by (name, project, shoot_name, support_group) (
         label_replace(
-          mcm_machine_current_status_phase{
-            job="machine-controller-manager",
-          },
-          "shoot", "$1",
-          "namespace", "shoot--cp--(.*)"
+          label_replace(
+            label_replace(
+              mcm_machine_current_status_phase{
+                job="machine-controller-manager",
+              },
+              "support_group", "containers", "__name__", ".*"
+            ),
+            "support_group", "storage", "project", "^storage$"
+          ),
+          "support_group", "compute", "project", "^compute$"
         )
       ) == -3
     for: {{ dig "MCMMachineFailed" "for" "30m" .Values.prometheusRules }}
@@ -294,22 +309,27 @@ groups:
       severity: {{ dig "MCMMachineFailed" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineFailed.md
       service: gardener
-      support_group: {{ dig "MCMMachineFailed" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is in Failed state. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is in Failed state.
+      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in Failed state. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in Failed state.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.MCMMachineCrashLoopBackOff | default false) }}
   - alert: MCMMachineCrashLoopBackOff
     expr: >
-      sum by (name, shoot) (
+      sum by (name, project, shoot_name, support_group) (
         label_replace(
-          mcm_machine_current_status_phase{
-            job="machine-controller-manager",
-          },
-          "shoot", "$1",
-          "namespace", "shoot--cp--(.*)"
+          label_replace(
+            label_replace(
+              mcm_machine_current_status_phase{
+                job="machine-controller-manager",
+              },
+              "support_group", "containers", "__name__", ".*"
+            ),
+            "support_group", "storage", "project", "^storage$"
+          ),
+          "support_group", "compute", "project", "^compute$"
         )
       ) == -2
     for: {{ dig "MCMMachineCrashLoopBackOff" "for" "30m" .Values.prometheusRules }}
@@ -318,22 +338,27 @@ groups:
       severity: {{ dig "MCMMachineCrashLoopBackOff" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineCrashLoopBackOff.md
       service: gardener
-      support_group: {{ dig "MCMMachineCrashLoopBackOff" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is in CrashLoopBackOff state. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is in CrashLoopBackOff state.
+      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in CrashLoopBackOff state. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in CrashLoopBackOff state.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.MCMMachineStuckInPending | default false) }}
   - alert: MCMMachineStuckInPending
     expr: >
-      sum by (name, shoot) (
+      sum by (name, project, shoot_name, support_group) (
         label_replace(
-          mcm_machine_current_status_phase{
-            job="machine-controller-manager",
-          },
-          "shoot", "$1",
-          "namespace", "shoot--cp--(.*)"
+          label_replace(
+            label_replace(
+              mcm_machine_current_status_phase{
+                job="machine-controller-manager",
+              },
+              "support_group", "containers", "__name__", ".*"
+            ),
+            "support_group", "storage", "project", "^storage$"
+          ),
+          "support_group", "compute", "project", "^compute$"
         )
       ) == 0
     for: {{ dig "MCMMachineStuckInPending" "for" "30m" .Values.prometheusRules }}
@@ -342,8 +367,8 @@ groups:
       severity: {{ dig "MCMMachineStuckInPending" "severity" "warning" .Values.prometheusRules }}
       playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineStuckInPending.md
       service: gardener
-      support_group: {{ dig "MCMMachineStuckInPending" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is stuck in Pending state. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot }}`}} is stuck in Pending state.
+      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Pending state. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Pending state.
 {{- end }}

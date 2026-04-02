@@ -1,0 +1,37 @@
+groups:
+- name: controlplane-backup
+  rules:
+{{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupRestartRate | default false) }}
+  - alert: EtcdKCPBackupCrashLoopBackOff
+    expr: >
+      max_over_time(
+        kube_pod_container_status_waiting_reason{
+          pod=~"etcd-kcp-backup-[a-z0-9]{8,10}-[a-z0-9]{5}",
+          reason="CrashLoopBackOff"
+        }[5m]
+      ) == 1
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "EtcdKCPBackupCrashLoopBackOff" "severity" "info" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupCrashLoopBackOff.md
+      service: {{ dig "EtcdKCPBackupCrashLoopBackOff" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "EtcdKCPBackupCrashLoopBackOff" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} on cluster {{`{{ $labels.cluster }}`}} is in CrashLoopBackOff. Check pod logs and events for more details.
+      summary: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} on cluster {{`{{ $labels.cluster }}`}} is in CrashLoopBackOff.
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupRestartRate | default false) }}
+  - alert: EtcdKCPBackupRestartRate
+    expr: >
+      rate(kube_pod_container_status_restarts_total{pod=~"etcd-kcp-backup-[a-z0-9]{8,10}-[a-z0-9]{5}"}[15m]) > 0
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "EtcdKCPBackupRestartRate" "severity" "info" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupRestartRate.md
+      service: {{ dig "EtcdKCPBackupRestartRate" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "EtcdKCPBackupRestartRate" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} on cluster {{`{{ $labels.cluster }}`}} is restarting frequently. Check pod logs and events for more details.
+      summary: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} on cluster {{`{{ $labels.cluster }}`}} is restarting frequently.
+{{- end }}

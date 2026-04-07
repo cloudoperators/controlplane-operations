@@ -54,7 +54,6 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupSnapshotTooOld | default false) }}
   - alert: EtcdKCPBackupSnapshotTooOld
     expr: >
-      # Alert if the latest full snapshot is older than 24 hours on all pods
       (
         (time() - etcdbr_snapshot_latest_timestamp{kind="Full"}) > 24 * 3600
       )

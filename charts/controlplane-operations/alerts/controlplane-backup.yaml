@@ -1,7 +1,7 @@
 groups:
 - name: controlplane-backup
   rules:
-{{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupRestartRate | default false) }}
+{{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupCrashLoopBackOff | default false) }}
   - alert: EtcdKCPBackupCrashLoopBackOff
     expr: >
       max_over_time(
@@ -18,7 +18,7 @@ groups:
       support_group: {{ dig "EtcdKCPBackupCrashLoopBackOff" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} on cluster {{`{{ $labels.cluster }}`}} is in CrashLoopBackOff. Check pod logs and events for more details.
-      summary: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} on cluster {{`{{ $labels.cluster }}`}} is in CrashLoopBackOff.
+      summary: etcd KCP backup Pod {{`{{ $labels.pod }}`}} on {{`{{ $labels.cluster }}`}} is in CrashLoopBackOff.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupRestartRate | default false) }}
@@ -33,13 +33,13 @@ groups:
       support_group: {{ dig "EtcdKCPBackupRestartRate" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} on cluster {{`{{ $labels.cluster }}`}} is restarting frequently. Check pod logs and events for more details.
-      summary: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} on cluster {{`{{ $labels.cluster }}`}} is restarting frequently.
+      summary: etcd KCP backup Pod {{`{{ $labels.pod }}`}} on {{`{{ $labels.cluster }}`}} is restarting frequently.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupFailure | default false) }}
   - alert: EtcdKCPBackupFailure
     expr: >
-      etcdbr_snapshot_duration_seconds_count{kind="Full",succeeded="false"} == 1
+      etcdbr_snapshot_duration_seconds_count{kind="Full",succeeded="false"} > 0
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "EtcdKCPBackupFailure" "severity" "info" .Values.prometheusRules }}
@@ -48,7 +48,7 @@ groups:
       support_group: {{ dig "EtcdKCPBackupFailure" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} with instance IP {{`{{ $labels.instance }}`}} failed full snapshot. Check pod logs and events for more details.
-      summary: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} with instance IP {{`{{ $labels.instance }}`}} failed full snapshot.
+      summary: etcd KCP backup Pod {{`{{ $labels.pod }}`}} failed full snapshot.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupSnapshotTooOld | default false) }}
@@ -70,5 +70,5 @@ groups:
       support_group: {{ dig "EtcdKCPBackupSnapshotTooOld" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       description: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} with instance IP {{`{{ $labels.instance }}`}} has an outdated full snapshot. Check pod logs and events for more details.
-      summary: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} with instance IP {{`{{ $labels.instance }}`}} has an outdated full snapshot.
+      summary: etcd KCP backup Pod {{`{{ $labels.pod }}`}} has an outdated full snapshot.
 {{- end }}

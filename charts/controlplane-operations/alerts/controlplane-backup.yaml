@@ -54,13 +54,14 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupSnapshotTooOld | default false) }}
   - alert: EtcdKCPBackupSnapshotTooOld
     expr: >
-      ( # Alert if the latest full snapshot is older than 2 hours on more than 2 backup pods (we have 3 backup pods, so we alert if 2 or more are affected)
-        (time() - etcdbr_snapshot_latest_timestamp{kind="Full"}) > 2 * 3600
+      # Alert if the latest full snapshot is older than 24 hours on all pods
+      (
+        (time() - etcdbr_snapshot_latest_timestamp{kind="Full"}) > 24 * 3600
       )
       AND
       on()
       count(
-        (time() - etcdbr_snapshot_latest_timestamp{kind="Full"}) > 2 * 3600
+        (time() - etcdbr_snapshot_latest_timestamp{kind="Full"}) > 24 * 3600
       ) > 2
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}

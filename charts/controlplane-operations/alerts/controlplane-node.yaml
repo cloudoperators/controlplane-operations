@@ -30,3 +30,4 @@ groups:
       description: KCP node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} is not Ready. Check node conditions and events for more details.
       summary: KCP node {{`{{ $labels.node }}`}} on cluster {{`{{ $labels.cluster }}`}} is not Ready.
 {{- end }}
+

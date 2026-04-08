@@ -45,7 +45,7 @@ groups:
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
       description: Shoot {{`{{ $labels.name }}`}} from project {{`{{ $labels.project }}`}} on {{`{{ $labels.landscape }}`}} is not being reconciled successfully for {{ dig "ShootReconciliationFailed" "for" "30m" .Values.prometheusRules }} minutes. Check the shoot's conditions and events for more details.
-      summary: Shoot {{`{{ $labels.name }}`}} from project {{`{{ $labels.project }}`}} on {{`{{ $labels.landscape }}`}} is not being reconciled successfully.
+      summary: Shoot {{`{{ $labels.name }}`}} on {{`{{ $labels.landscape }}`}} is not being reconciled successfully.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.ShootConditionNotTrue | default false) }}
@@ -74,7 +74,7 @@ groups:
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
       description: Shoot {{`{{ $labels.name }}`}} of project {{`{{ $labels.project }}`}} seeded from {{`{{ $labels.landscape }}`}}/{{`{{ $labels.seed }}`}} has a condition that is not True. Check the Shoot's conditions and events for more details.
-      summary: Shoot {{`{{ $labels.name }}`}} of project {{`{{ $labels.project }}`}} seeded from {{`{{ $labels.landscape }}`}}/{{`{{ $labels.seed }}`}} has a condition that is not True.
+      summary: Shoot {{`{{ $labels.name }}`}} seeded from {{`{{ $labels.seed }}`}} has a condition that is not True.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.SeedConditionNotTrue | default false) }}
@@ -149,7 +149,7 @@ groups:
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
       description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors. BGP peer is not established. Network datapath threatened! Switch upgrades or misconfiguration?
-      summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors.
+      summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}} has less than {{ .Values.prometheusRules.calico.bgpNeighborCount }} BGP neighbors.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.CalicoBgpNeighborSessionAllDown | default false) }}
@@ -177,7 +177,7 @@ groups:
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
         description: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has no BGP neighbors. Network datapath is down! Switch upgrades or misconfiguration?
-        summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot/Node {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}}/{{`{{ $labels.node }}`}} has no BGP neighbors.
+        summary: Calico Node Pod {{`{{ $labels.pod }}`}} on Shoot {{trimPrefix "shoot--cp--" "`{{ $labels.cluster }}`"}} has no BGP neighbors.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.CalicoNodeMissing | default false) }}
@@ -253,8 +253,8 @@ groups:
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is not Ready. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is not Ready.
+      description: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is not Ready. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} is not Ready.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.MCMMachineStuckInTerminating | default false) }}
@@ -282,8 +282,8 @@ groups:
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Terminating state. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Terminating state.
+      description: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Terminating state. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} is stuck in Terminating state.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.MCMMachineFailed | default false) }}
@@ -311,8 +311,8 @@ groups:
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in Failed state. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in Failed state.
+      description: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in Failed state. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} is in Failed state.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.MCMMachineCrashLoopBackOff | default false) }}
@@ -340,8 +340,8 @@ groups:
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in CrashLoopBackOff state. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in CrashLoopBackOff state.
+      description: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is in CrashLoopBackOff state. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} is in CrashLoopBackOff state.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.MCMMachineStuckInPending | default false) }}
@@ -369,6 +369,6 @@ groups:
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
-      description: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Pending state. Check the Machine's conditions and events for more details.
-      summary: Machine {{`{{ $labels.name }}`}} from shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Pending state.
+      description: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} of project {{`{{ $labels.project }}`}} is stuck in Pending state. Check the Machine's conditions and events for more details.
+      summary: Machine {{`{{ $labels.name }}`}} from Shoot {{`{{ $labels.shoot_name }}`}} is stuck in Pending state.
 {{- end }}

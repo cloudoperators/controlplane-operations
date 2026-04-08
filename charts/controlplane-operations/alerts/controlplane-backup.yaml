@@ -51,11 +51,14 @@ groups:
       summary: etcd KCP backup Pod {{`{{ $labels.pod }}`}} failed full snapshot.
 {{- end }}
 
-{{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupSnapshotTooOld | default false) }}
-  - alert: EtcdKCPBackupSnapshotTooOld
+{{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupFullSnapshotTooOld | default false) }}
+  - alert: EtcdKCPBackupFullSnapshotTooOld
     expr: >
       (
-        (time() - etcdbr_snapshot_latest_timestamp{kind="Full"}) > 24 * 3600
+        bottomk(
+          1,
+          (time() - etcdbr_snapshot_latest_timestamp{kind="Full"}) > 24 * 3600
+        )
       )
       AND
       on()
@@ -64,11 +67,36 @@ groups:
       ) > 2
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
-      severity: {{ dig "EtcdKCPBackupSnapshotTooOld" "severity" "info" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupSnapshotTooOld.md
-      service: {{ dig "EtcdKCPBackupSnapshotTooOld" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
-      support_group: {{ dig "EtcdKCPBackupSnapshotTooOld" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+      severity: {{ dig "EtcdKCPBackupFullSnapshotTooOld" "severity" "info" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupFullSnapshotTooOld.md
+      service: {{ dig "EtcdKCPBackupFullSnapshotTooOld" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "EtcdKCPBackupFullSnapshotTooOld" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} with instance IP {{`{{ $labels.instance }}`}} has an outdated full snapshot. Check pod logs and events for more details.
-      summary: etcd KCP backup Pod {{`{{ $labels.pod }}`}} has an outdated full snapshot.
+      description: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} with instance IP {{`{{ $labels.instance }}`}} has a full snapshot that is too old. Check pod logs and events for more details.
+      summary: etcd KCP backup Pod {{`{{ $labels.pod }}`}} has a full snapshot that is too old.
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.EtcdKCPBackupIncrSnapshotTooOld | default false) }}
+  - alert: EtcdKCPBackupIncrSnapshotTooOld
+    expr: >
+      (
+        bottomk(
+          1,
+          (time() - etcdbr_snapshot_latest_timestamp{kind="Incr"}) > 600
+        )
+      )
+      AND
+      on()
+      count(
+        (time() - etcdbr_snapshot_latest_timestamp{kind="Incr"}) > 600
+      ) > 2
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "EtcdKCPBackupIncrSnapshotTooOld" "severity" "info" .Values.prometheusRules }}
+      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupIncrSnapshotTooOld.md
+      service: {{ dig "EtcdKCPBackupIncrSnapshotTooOld" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "EtcdKCPBackupIncrSnapshotTooOld" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: etcd KCP backup Pod {{`{{ $labels.namespace }}`}}/{{`{{ $labels.pod }}`}} with instance IP {{`{{ $labels.instance }}`}} has an incremental snapshot that is too old. Check pod logs and events for more details.
+      summary: etcd KCP backup Pod {{`{{ $labels.pod }}`}} has incremental snapshot that is too old.
 {{- end }}

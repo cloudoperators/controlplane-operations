@@ -14,8 +14,8 @@ groups:
       service: {{ dig "ArgoraUpdateInError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ArgoraUpdateInError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: "Argora Update CR status is in Error state for more than 10 minutes."
-      summary: "Update CR in Error state."
+      description: Argora Update CR status is in Error state for more than {{ dig "ArgoraUpdateInError" "for" "10m" .Values.prometheusRules }} minutes.
+      summary: Update CR in Error state.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.ArgoraClusterImportInError | default false) }}
@@ -31,8 +31,8 @@ groups:
       service: {{ dig "ArgoraClusterImportInError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ArgoraClusterImportInError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: "Argora ClusterImport CR status is in Error state for more than 10 minutes."
-      summary: "ClusterImport CR in Error state."
+      description: Argora ClusterImport CR status is in Error state for more than {{ dig "ArgoraClusterImportInError" "for" "10m" .Values.prometheusRules }} minutes.
+      summary: ClusterImport CR in Error state.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.ArgoraPodNotReadyError | default false) }}
@@ -47,8 +47,8 @@ groups:
       service: {{ dig "ArgoraPodNotReadyError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ArgoraPodNotReadyError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: "Argora Pod is not ready for more than 5 minutes."
-      summary: "Pod not ready."
+      description: Argora Pod is not ready for more than {{ dig "ArgoraPodNotReadyError" "for" "5m" .Values.prometheusRules }} minutes.
+      summary: Pod not ready.
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.ServerStuckInDiscovery | default false) }}
@@ -64,6 +64,6 @@ groups:
       service: {{ dig "ServerStuckInDiscovery" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ServerStuckInDiscovery" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      description: "Server is stuck in Discovery for more than 15 minutes."
-      summary: "Server stuck in Discovery."
+      description: Server is stuck in Discovery for more than {{ dig "ServerStuckInDiscovery" "for" "15m" .Values.prometheusRules }} minutes.
+      summary: Server stuck in Discovery.
 {{- end }}

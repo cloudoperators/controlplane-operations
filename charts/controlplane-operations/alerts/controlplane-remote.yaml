@@ -72,7 +72,7 @@ groups:
   - alert: WebhookCertificateNearExpiry
     expr: |
       (webhook_injector_certificate_expiry_time_seconds - time()) < (90 * 24 * 3600 * 0.2)
-    for: 5m
+    for: {{ dig "WebhookCertificateNearExpiry" "for" "5m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookCertificateNearExpiry" "severity" "warning" .Values.prometheusRules }}
@@ -88,7 +88,7 @@ groups:
   - alert: WebhookCertificateAboutToExpire
     expr: |
       (webhook_injector_certificate_expiry_time_seconds - time()) < (3 * 24 * 3600)
-    for: 5m
+    for: {{ dig "WebhookCertificateAboutToExpire" "for" "5m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookCertificateAboutToExpire" "severity" "critical" .Values.prometheusRules }}

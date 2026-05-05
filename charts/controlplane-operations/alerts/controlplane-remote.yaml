@@ -80,8 +80,8 @@ groups:
       service: {{ dig "WebhookCertificateNearExpiry" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookCertificateNearExpiry" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      summary: "Webhook certificate is below rotation threshold"
-      description: "Certificate expires in {{ $value | humanizeDuration }}, rotation should have happened since its below threshold."
+      summary: "Webhook certificate is below rotation threshold."
+      description: "Certificate expires soon, rotation should have happened since its below threshold."
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.WebhookCertificateAboutToExpire | default false) }}
@@ -96,6 +96,6 @@ groups:
       service: {{ dig "WebhookCertificateAboutToExpire" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookCertificateAboutToExpire" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
-      summary: "Webhook certificate is about to expire"
-      description: "Certificate expires in less than 3 days, {{ $value | humanizeDuration }}."
+      summary: "Webhook certificate is about to expire."
+      description: "Certificate expires in less than 3 days."
 {{- end }}

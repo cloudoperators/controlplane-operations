@@ -81,7 +81,7 @@ groups:
       support_group: {{ dig "WebhookCertificateNearExpiry" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
       summary: "Webhook certificate is below rotation threshold."
-      description: "Certificate expires soon, rotation should have happened since its below threshold."
+      description: "Certificate expires soon, rotation should have happened since it's below threshold."
 {{- end }}
 
 {{- if not (.Values.prometheusRules.disabled.WebhookCertificateAboutToExpire | default false) }}

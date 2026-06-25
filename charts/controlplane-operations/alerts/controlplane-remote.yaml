@@ -103,7 +103,7 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.WebhookTargetStampErrors | default false) }}
   - alert: WebhookTargetStampErrors
     expr: |
-      sum(rate(webhook_injector_target_stamps_total{result="error"}[10m])) > 0
+      sum(rate(webhook_injector_target_stamps_total{result="error"}[5m])) > 0
     for: {{ dig "WebhookTargetStampErrors" "for" "10m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
@@ -119,7 +119,7 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.WebhookManagedResourceStampErrors | default false) }}
   - alert: WebhookManagedResourceStampErrors
     expr: |
-      sum(rate(webhook_injector_managed_resource_stamps_total{result="error"}[10m])) > 0
+      sum(rate(webhook_injector_managed_resource_stamps_total{result="error"}[5m])) > 0
     for: {{ dig "WebhookManagedResourceStampErrors" "for" "10m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
@@ -135,7 +135,7 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.WebhookManagedResourceUnhealthy | default false) }}
   - alert: WebhookManagedResourceUnhealthy
     expr: |
-      sum(rate(webhook_injector_managed_resource_unhealthy_total[15m])) > 0
+      sum(rate(webhook_injector_managed_resource_unhealthy_total[5m])) > 0
     for: {{ dig "WebhookManagedResourceUnhealthy" "for" "15m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
@@ -151,7 +151,7 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.WebhookManagedResourceKeepObjectsViolation | default false) }}
   - alert: WebhookManagedResourceKeepObjectsViolation
     expr: |
-      sum(rate(webhook_injector_managed_resource_keep_objects_violations_total[15m])) > 0
+      sum(rate(webhook_injector_managed_resource_keep_objects_violations_total[5m])) > 0
     for: {{ dig "WebhookManagedResourceKeepObjectsViolation" "for" "15m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
@@ -167,7 +167,7 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.WebhookManagedResourceForceReconcilePatchErrors | default false) }}
   - alert: WebhookManagedResourceForceReconcilePatchErrors
     expr: |
-      sum(rate(webhook_injector_managed_resource_force_reconcile_total{result="error"}[15m])) > 0
+      sum(rate(webhook_injector_managed_resource_force_reconcile_total{result="error"}[5m])) > 0
     for: {{ dig "WebhookManagedResourceForceReconcilePatchErrors" "for" "15m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}

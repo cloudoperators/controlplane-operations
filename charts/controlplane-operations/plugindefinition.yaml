@@ -5,7 +5,7 @@ metadata:
 spec:
   version: 1.1.13
   displayName: Controlplane operations bundle
-  description: Operations bundle for Controlane clusters
+  description: Operations bundle for Controlplane clusters
   docMarkDownUrl: https://raw.githubusercontent.com/cloudoperators/controlplane-operations/main/README.md
   icon: https://raw.githubusercontent.com/cloudoperators/controlplane-operations/main/charts/controlplane-operations/kubernetes-logo.png
   helmChart:

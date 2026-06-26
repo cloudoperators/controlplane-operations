@@ -179,3 +179,19 @@ groups:
       summary: "gardener.cloud/operation=reconcile patch failing on shoot {{`{{ $labels.namespace }}`}}."
       description: "webhook-injector stamped a ManagedResource Secret in namespace {{`{{ $labels.namespace }}`}} but failed to patch the gardener.cloud/operation=reconcile annotation on the parent MR. gardener-resource-manager may take up to its own watch/sync interval to notice the change rather than reconciling immediately — caBundle propagation to the shoot will still happen, but with extra latency. Check the webhook-injector logs in namespace {{`{{ $labels.namespace }}`}} for the affected MR name."
 {{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.WebhookCertificateRotationDeferredByUnhealthyMRs | default false) }}
+  - alert: WebhookCertificateRotationDeferredByUnhealthyMRs
+    expr: |
+      sum by (namespace) (rate(webhook_injector_certificate_rotation_deferred_unhealthy_mrs_total[5m])) > 0
+    for: {{ dig "WebhookCertificateRotationDeferredByUnhealthyMRs" "for" "15m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "WebhookCertificateRotationDeferredByUnhealthyMRs" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-certificate-rotation-deferred-by-unhealthy-mrs/ #TODO: add playbook
+      service: {{ dig "WebhookCertificateRotationDeferredByUnhealthyMRs" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "WebhookCertificateRotationDeferredByUnhealthyMRs" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      summary: "Certificate rotation on shoot {{`{{ $labels.namespace }}`}} is being held back by unhealthy ManagedResources."
+      description: "webhook-injector observed a non-force certificate rotation reason (expired/san_mismatch/etc.) on shoot {{`{{ $labels.namespace }}`}} but is deferring the rotation because at least one labeled ManagedResource has ResourcesApplied or ResourcesHealthy != True. The existing cert keeps being served; rotation will resume automatically when the MR(s) recover. If the cert reaches NotAfter before that happens, the rotation will proceed anyway with a louder warning log — but webhook calls on shoot-side CRDs may TLS-fail during the gap. Check the webhook-injector logs in namespace {{`{{ $labels.namespace }}`}} for the offending MR names, and the GRM/MR status for the underlying cause."
+{{- end }}

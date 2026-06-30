@@ -4,7 +4,7 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.ArgoraUpdateInError | default false) }}
   - alert: ArgoraUpdateInError
     expr: >
-      kube_customresource_status_state{customresource_kind="Update",customresource_group="argora.cloud.sap",state=~"Error"}
+      kube_customresource_update_status{customresource_kind="Update",customresource_group="argora.cloud.sap",state=~"Error"}
       == 1
     for: {{ dig "ArgoraUpdateInError" "for" "10m" .Values.prometheusRules }}
     labels:
@@ -21,7 +21,7 @@ groups:
 {{- if not (.Values.prometheusRules.disabled.ArgoraClusterImportInError | default false) }}
   - alert: ArgoraClusterImportInError
     expr: >
-      kube_customresource_status_state{customresource_kind="ClusterImport",customresource_group="argora.cloud.sap",state=~"Error"}
+      kube_customresource_cluster_import_status{customresource_kind="ClusterImport",customresource_group="argora.cloud.sap",state=~"Error"}
       == 1
     for: {{ dig "ArgoraClusterImportInError" "for" "10m" .Values.prometheusRules }}
     labels:

@@ -99,3 +99,83 @@ groups:
       summary: "Webhook certificate is about to expire."
       description: "Certificate expires in less than 3 days."
 {{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.WebhookTargetStampErrors | default false) }}
+  - alert: WebhookTargetStampErrors
+    expr: |
+      sum by (namespace, kind) (rate(webhook_injector_target_stamps_total{result="error"}[5m])) > 0
+    for: {{ dig "WebhookTargetStampErrors" "for" "10m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "WebhookTargetStampErrors" "severity" "critical" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-target-stamp-errors/ #TODO: add playbook
+      service: {{ dig "WebhookTargetStampErrors" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "WebhookTargetStampErrors" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      summary: "{{`{{ $labels.kind }}`}} apply to shoot {{`{{ $labels.namespace }}`}} is failing."
+      description: "webhook-injector failed to apply {{`{{ $labels.kind }}`}} to the target cluster of shoot {{`{{ $labels.namespace }}`}}. The freshly rotated caBundle is NOT reaching the admission webhooks on that shoot and subsequent CR writes may be rejected with TLS errors."
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.WebhookManagedResourceStampErrors | default false) }}
+  - alert: WebhookManagedResourceStampErrors
+    expr: |
+      sum by (namespace) (rate(webhook_injector_managed_resource_stamps_total{result="error"}[5m])) > 0
+    for: {{ dig "WebhookManagedResourceStampErrors" "for" "10m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "WebhookManagedResourceStampErrors" "severity" "critical" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-stamp-errors/ #TODO: add playbook
+      service: {{ dig "WebhookManagedResourceStampErrors" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "WebhookManagedResourceStampErrors" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      summary: "ManagedResource Secret caBundle stamp is failing on shoot {{`{{ $labels.namespace }}`}}."
+      description: "webhook-injector failed to stamp the freshly rotated caBundle onto a labeled ManagedResource Secret in namespace {{`{{ $labels.namespace }}`}}. The embedded CRDs will not refresh in the shoot via gardener-resource-manager, and conversion webhooks for those CRDs will fail TLS once the old cert is pruned. Check the webhook-injector logs in namespace {{`{{ $labels.namespace }}`}} for the offending MR name."
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.WebhookManagedResourceUnhealthy | default false) }}
+  - alert: WebhookManagedResourceUnhealthy
+    expr: |
+      sum by (namespace, condition, status) (rate(webhook_injector_managed_resource_unhealthy_total[5m])) > 0
+    for: {{ dig "WebhookManagedResourceUnhealthy" "for" "15m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "WebhookManagedResourceUnhealthy" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-unhealthy/ #TODO: add playbook
+      service: {{ dig "WebhookManagedResourceUnhealthy" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "WebhookManagedResourceUnhealthy" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      summary: "ManagedResource on shoot {{`{{ $labels.namespace }}`}} is unhealthy ({{`{{ $labels.condition }}`}}={{`{{ $labels.status }}`}})."
+      description: "A labeled ManagedResource in namespace {{`{{ $labels.namespace }}`}} has condition {{`{{ $labels.condition }}`}} with status {{`{{ $labels.status }}`}} (expected True). gardener-resource-manager is unable to apply or keep the resources healthy in the shoot, so caBundle propagation to shoot-side CRDs is degraded. Check the MR's status conditions for Reason/Message and the webhook-injector logs in namespace {{`{{ $labels.namespace }}`}} for the affected MR name."
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.WebhookManagedResourceKeepObjectsViolation | default false) }}
+  - alert: WebhookManagedResourceKeepObjectsViolation
+    expr: |
+      sum by (namespace) (rate(webhook_injector_managed_resource_keep_objects_violations_total[5m])) > 0
+    for: {{ dig "WebhookManagedResourceKeepObjectsViolation" "for" "15m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "WebhookManagedResourceKeepObjectsViolation" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-keep-objects-violation/ #TODO: add playbook
+      service: {{ dig "WebhookManagedResourceKeepObjectsViolation" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "WebhookManagedResourceKeepObjectsViolation" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      summary: "ManagedResource on shoot {{`{{ $labels.namespace }}`}} ships CRDs without spec.keepObjects=true."
+      description: "A labeled ManagedResource in namespace {{`{{ $labels.namespace }}`}} ships at least one CRD but does not set spec.keepObjects=true. Deleting that MR (intentionally or accidentally) would cascade-delete the shoot-side CRDs and every custom resource of those kinds. Fix by setting spec.keepObjects=true on the MR — the stamp still works either way, but the destructive shape needs to be addressed. Check the webhook-injector logs in namespace {{`{{ $labels.namespace }}`}} for the offending MR name."
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.WebhookManagedResourceForceReconcilePatchErrors | default false) }}
+  - alert: WebhookManagedResourceForceReconcilePatchErrors
+    expr: |
+      sum by (namespace) (rate(webhook_injector_managed_resource_force_reconcile_total{result="error"}[5m])) > 0
+    for: {{ dig "WebhookManagedResourceForceReconcilePatchErrors" "for" "15m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "WebhookManagedResourceForceReconcilePatchErrors" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-force-reconcile-patch-errors/ #TODO: add playbook
+      service: {{ dig "WebhookManagedResourceForceReconcilePatchErrors" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "WebhookManagedResourceForceReconcilePatchErrors" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      summary: "gardener.cloud/operation=reconcile patch failing on shoot {{`{{ $labels.namespace }}`}}."
+      description: "webhook-injector stamped a ManagedResource Secret in namespace {{`{{ $labels.namespace }}`}} but failed to patch the gardener.cloud/operation=reconcile annotation on the parent MR. gardener-resource-manager may take up to its own watch/sync interval to notice the change rather than reconciling immediately — caBundle propagation to the shoot will still happen, but with extra latency. Check the webhook-injector logs in namespace {{`{{ $labels.namespace }}`}} for the affected MR name."
+{{- end }}

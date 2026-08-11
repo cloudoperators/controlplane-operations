@@ -116,6 +116,22 @@ groups:
       description: "webhook-injector failed to apply {{`{{ $labels.kind }}`}} to the target cluster of shoot {{`{{ $labels.namespace }}`}}. The freshly rotated caBundle is NOT reaching the admission webhooks on that shoot and subsequent CR writes may be rejected with TLS errors."
 {{- end }}
 
+{{- if not (.Values.prometheusRules.disabled.WebhookTargetCRDStampErrors | default false) }}
+  - alert: WebhookTargetCRDStampErrors
+    expr: |
+      sum by (namespace) (rate(webhook_injector_target_crd_stamps_total{result="error"}[5m])) > 0
+    for: {{ dig "WebhookTargetCRDStampErrors" "for" "10m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "WebhookTargetCRDStampErrors" "severity" "critical" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-target-crd-stamp-errors/ #TODO: add playbook
+      service: {{ dig "WebhookTargetCRDStampErrors" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "WebhookTargetCRDStampErrors" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      summary: "CRD conversion-webhook caBundle stamp to shoot {{`{{ $labels.namespace }}`}} is failing."
+      description: "webhook-injector (target patch mode, --target-label) failed to patch spec.conversion.webhook.clientConfig.caBundle on a labeled CustomResourceDefinition directly applied to the target cluster of shoot {{`{{ $labels.namespace }}`}}. The freshly rotated caBundle is NOT reaching the CRD's conversion webhook, so conversion calls for those custom resources will fail TLS once the old cert is pruned. This is the GRM-free / direct-apply counterpart of WebhookManagedResourceStampErrors. Check the webhook-injector logs in namespace {{`{{ $labels.namespace }}`}} for the offending CRD name."
+{{- end }}
+
 {{- if not (.Values.prometheusRules.disabled.WebhookManagedResourceStampErrors | default false) }}
   - alert: WebhookManagedResourceStampErrors
     expr: |

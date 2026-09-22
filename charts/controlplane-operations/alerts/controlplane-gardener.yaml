@@ -182,7 +182,10 @@ groups:
 
 {{- if not (.Values.prometheusRules.disabled.CalicoNodeMissing | default false) }}
   - alert: CalicoNodeMissing
-    expr: count(up{job="kubelet"}) > count(_pod_to_daemonset{owner_name="calico-node"} == 1)
+    expr: |
+      count by (cluster) (kube_node_info)
+        > on (cluster)
+      count by (cluster) (kube_pod_owner{owner_kind="DaemonSet", owner_name="calico-node"})
     for: {{ dig "CalicoNodeMissing" "for" "30m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}

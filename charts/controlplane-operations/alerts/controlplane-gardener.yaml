@@ -185,11 +185,7 @@ groups:
     expr: |
       count by (cluster) (kube_node_info)
         > on (cluster)
-      (
-        count by (cluster) (kube_pod_owner{owner_kind="DaemonSet", owner_name="calico-node"})
-          or on (cluster)
-        (count by (cluster) (kube_node_info) * 0)
-      )
+      count by (cluster) (kube_pod_owner{owner_kind="DaemonSet", owner_name="calico-node"})
     for: {{ dig "CalicoNodeMissing" "for" "30m" .Values.prometheusRules }}
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}

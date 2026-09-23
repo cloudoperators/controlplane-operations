@@ -8,7 +8,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "KubernetesNodeBridgeFilterVLANTagged" "severity" "info" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesNodeBridgeFilterVLANTagged.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/kubernetes-node-bridge-filter-vlan-tagged/
       service: {{ dig "KubernetesNodeBridgeFilterVLANTagged" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "KubernetesNodeBridgeFilterVLANTagged" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -23,7 +23,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "KubernetesNodeKCPNotReady" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/KubernetesNodeKCPNotReady.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/kubernetes-node-kcp-not-ready/
       service: {{ dig "KubernetesNodeKCPNotReady" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "KubernetesNodeKCPNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:

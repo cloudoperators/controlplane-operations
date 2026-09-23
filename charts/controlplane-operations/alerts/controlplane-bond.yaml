@@ -8,7 +8,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "NodeBondDegradedMain" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeBondDegradedMain.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/node-bond-degraded-main/
       service: {{ dig "NodeBondDegradedMain" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "NodeBondDegradedMain" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -23,7 +23,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "NodeVirtualInterfaceDown" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/NodeVirtualInterfaceDown.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/node-virtual-interface-down/
       service: {{ dig "NodeVirtualInterfaceDown" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "NodeVirtualInterfaceDown" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:

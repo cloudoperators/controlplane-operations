@@ -124,7 +124,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookTargetCRDStampErrors" "severity" "critical" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-target-crd-stamp-errors/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-target-crd-stamp-errors/
       service: {{ dig "WebhookTargetCRDStampErrors" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookTargetCRDStampErrors" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:

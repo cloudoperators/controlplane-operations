@@ -11,12 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - name: All playbook URLs must point to the docs site
+      - name: All playbook URLs must point to the docs site and resolve
         run: |
           bad=0
           while IFS= read -r url; do
-            if ! echo "$url" | grep -qE '^https://operations\.global\.cloud\.sap/docs/support/playbook/[a-z0-9-]+/$'; then
-              echo "Non-canonical playbook URL: $url"
+            if ! echo "$url" | grep -qE '^https://operations\.global\.cloud\.sap/docs/support/playbook/[a-z0-9-]+/$' \
+               || ! curl --fail --silent --show-error --location --output /dev/null "$url"; then
+              echo "Bad or unresolvable playbook URL: $url"
               bad=1
             fi
           done < <(
@@ -26,10 +27,22 @@ jobs:
           )
           [ "$bad" -eq 0 ] || {
             echo ""
-            echo "All playbook: values must match:"
+            echo "All playbook: values must match the canonical pattern and return HTTP 2xx:"
             echo "  https://operations.global.cloud.sap/docs/support/playbook/<slug>/"
             exit 1
           }
+
+      - name: Every alert rule must have exactly one playbook value
+        run: |
+          alert_count=$(grep -rch '^\s*- alert:' charts/controlplane-operations/alerts/ | awk -F: '{sum+=$2} END{print sum}')
+          playbook_count=$(grep -rch 'playbook:' charts/controlplane-operations/alerts/ | awk -F: '{sum+=$2} END{print sum}')
+          if [ "$alert_count" -ne "$playbook_count" ]; then
+            echo "Mismatch: $alert_count alert rules but $playbook_count playbook: values"
+            echo "Every alert rule must have exactly one playbook: label"
+            grep -rn '^\s*- alert:' charts/controlplane-operations/alerts/
+            exit 1
+          fi
+          echo "OK: $alert_count alert rules, $playbook_count playbook: values"
 
       - name: No unresolved playbook TODOs
         run: |

@@ -1,0 +1,40 @@
+name: "Check alert playbook URLs"
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'charts/controlplane-operations/alerts/**.yaml'
+
+jobs:
+  playbook-urls:
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: All playbook URLs must point to the docs site
+        run: |
+          bad=0
+          while IFS= read -r url; do
+            if ! echo "$url" | grep -qE '^https://operations\.global\.cloud\.sap/docs/support/playbook/[a-z0-9-]+/$'; then
+              echo "Non-canonical playbook URL: $url"
+              bad=1
+            fi
+          done < <(
+            grep -rh 'playbook:' charts/controlplane-operations/alerts/ \
+              | sed 's/.*playbook:[[:space:]]*//' \
+              | sed 's/[[:space:]]*#.*//'
+          )
+          [ "$bad" -eq 0 ] || {
+            echo ""
+            echo "All playbook: values must match:"
+            echo "  https://operations.global.cloud.sap/docs/support/playbook/<slug>/"
+            exit 1
+          }
+
+      - name: No unresolved playbook TODOs
+        run: |
+          if grep -rn '#TODO.*playbook\|playbook.*#TODO' charts/controlplane-operations/alerts/; then
+            echo ""
+            echo "Found '#TODO' playbook comment(s). Write the playbook before merging the alert."
+            exit 1
+          fi

@@ -204,7 +204,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookCertificateRotationDeferredByUnhealthyMRs" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-certificate-rotation-deferred-by-unhealthy-mrs/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-certificate-rotation-deferred-by-unhealthy-mrs/
       service: {{ dig "WebhookCertificateRotationDeferredByUnhealthyMRs" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookCertificateRotationDeferredByUnhealthyMRs" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:

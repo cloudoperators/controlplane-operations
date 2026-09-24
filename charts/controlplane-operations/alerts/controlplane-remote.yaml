@@ -10,7 +10,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ArgoraUpdateInError" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-update-in-error/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-update-in-error/
       service: {{ dig "ArgoraUpdateInError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ArgoraUpdateInError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -27,7 +27,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ArgoraClusterImportInError" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-clusterimport-in-error/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-clusterimport-in-error/
       service: {{ dig "ArgoraClusterImportInError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ArgoraClusterImportInError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -43,7 +43,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ArgoraPodNotReadyError" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-pod-not-ready/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-pod-not-ready/
       service: {{ dig "ArgoraPodNotReadyError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ArgoraPodNotReadyError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -60,7 +60,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ServerStuckInDiscovery" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/server-stuck-in-discovery/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/server-stuck-in-discovery/
       service: {{ dig "ServerStuckInDiscovery" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "ServerStuckInDiscovery" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -76,7 +76,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookCertificateNearExpiry" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-certificate-near-expiry/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-certificate-near-expiry/
       service: {{ dig "WebhookCertificateNearExpiry" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookCertificateNearExpiry" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -92,7 +92,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookCertificateAboutToExpire" "severity" "critical" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-certificate-about-to-expire/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-certificate-about-to-expire/
       service: {{ dig "WebhookCertificateAboutToExpire" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookCertificateAboutToExpire" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -108,7 +108,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookTargetStampErrors" "severity" "critical" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-target-stamp-errors/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-target-stamp-errors/
       service: {{ dig "WebhookTargetStampErrors" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookTargetStampErrors" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -124,7 +124,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookTargetCRDStampErrors" "severity" "critical" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-target-crd-stamp-errors/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-target-crd-stamp-errors/
       service: {{ dig "WebhookTargetCRDStampErrors" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookTargetCRDStampErrors" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -140,7 +140,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookManagedResourceStampErrors" "severity" "critical" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-stamp-errors/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-stamp-errors/
       service: {{ dig "WebhookManagedResourceStampErrors" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookManagedResourceStampErrors" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -156,7 +156,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookManagedResourceUnhealthy" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-unhealthy/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-unhealthy/
       service: {{ dig "WebhookManagedResourceUnhealthy" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookManagedResourceUnhealthy" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -172,7 +172,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookManagedResourceKeepObjectsViolation" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-keep-objects-violation/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-keep-objects-violation/
       service: {{ dig "WebhookManagedResourceKeepObjectsViolation" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookManagedResourceKeepObjectsViolation" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -188,7 +188,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "WebhookManagedResourceForceReconcilePatchErrors" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-force-reconcile-patch-errors/ #TODO: add playbook
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-managed-resource-force-reconcile-patch-errors/
       service: {{ dig "WebhookManagedResourceForceReconcilePatchErrors" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "WebhookManagedResourceForceReconcilePatchErrors" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:

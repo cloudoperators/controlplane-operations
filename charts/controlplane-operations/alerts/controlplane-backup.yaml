@@ -13,7 +13,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "EtcdKCPBackupCrashLoopBackOff" "severity" "info" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupCrashLoopBackOff.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/etcd-kcp-backup-crash-loop-back-off/
       service: {{ dig "EtcdKCPBackupCrashLoopBackOff" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "EtcdKCPBackupCrashLoopBackOff" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -28,7 +28,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "EtcdKCPBackupRestartRate" "severity" "info" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupRestartRate.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/etcd-kcp-backup-restart-rate/
       service: {{ dig "EtcdKCPBackupRestartRate" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "EtcdKCPBackupRestartRate" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -43,7 +43,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "EtcdKCPBackupFailure" "severity" "info" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupFailure.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/etcd-kcp-backup-failure/
       service: {{ dig "EtcdKCPBackupFailure" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "EtcdKCPBackupFailure" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -68,7 +68,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "EtcdKCPBackupFullSnapshotTooOld" "severity" "info" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupFullSnapshotTooOld.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/etcd-kcp-backup-full-snapshot-too-old/
       service: {{ dig "EtcdKCPBackupFullSnapshotTooOld" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "EtcdKCPBackupFullSnapshotTooOld" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -93,7 +93,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "EtcdKCPBackupIncrSnapshotTooOld" "severity" "info" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/EtcdKCPBackupIncrSnapshotTooOld.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/etcd-kcp-backup-incr-snapshot-too-old/
       service: {{ dig "EtcdKCPBackupIncrSnapshotTooOld" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
       support_group: {{ dig "EtcdKCPBackupIncrSnapshotTooOld" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:

@@ -40,7 +40,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ShootReconciliationFailed" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootReconciliationFailed.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/shoot-reconciliation-failed/
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -69,7 +69,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "ShootConditionNotTrue" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/ShootConditionNotTrue.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/shoot-condition-not-true/
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -98,7 +98,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "SeedConditionNotTrue" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/SeedConditionNotTrue.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/seed-condition-not-true/
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -113,7 +113,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "GardenNotReady" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/GardenNotReady.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/garden-not-ready/
       service: gardener
       support_group: {{ dig "GardenNotReady" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -144,7 +144,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "CalicoBgpNeighborSessionDown" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoBgpNeighborSessionDown.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/calico-bgp-neighbor-session-down/
       service: calico
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -172,7 +172,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "CalicoBgpNeighborSessionAllDown" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoBgpNeighborSessionAllDown.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/calico-bgp-neighbor-session-all-down/
       service: calico
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -190,7 +190,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "CalicoNodeMissing" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoNodeMissing.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/calico-node-missing/
       service: calico
       support_group: {{ dig "CalicoNodeMissing" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
     annotations:
@@ -220,7 +220,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "CalicoNodeNotReady" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/CalicoNodeNotReady.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/calico-node-not-ready/
       service: calico
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -252,7 +252,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "MCMMachineNotReady" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineNotReady.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/mcm-machine-not-ready/
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -281,7 +281,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "MCMMachineStuckInTerminating" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineStuckInTerminating.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/mcm-machine-stuck-in-terminating/
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -310,7 +310,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "MCMMachineFailed" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineFailed.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/mcm-machine-failed/
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -339,7 +339,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "MCMMachineCrashLoopBackOff" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineCrashLoopBackOff.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/mcm-machine-crash-loop-back-off/
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:
@@ -368,7 +368,7 @@ groups:
     labels:
       {{ include "controlplane-operations.additionalRuleLabels" . }}
       severity: {{ dig "MCMMachineStuckInPending" "severity" "warning" .Values.prometheusRules }}
-      playbook: https://github.com/cobaltcore-dev/controlplane-operations/playbooks/MCMMachineStuckInPending.md
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/mcm-machine-stuck-in-pending/
       service: gardener
       support_group: "{{`{{ $labels.support_group }}`}}"
     annotations:

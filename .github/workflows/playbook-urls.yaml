@@ -1,0 +1,82 @@
+name: "Check alert playbook URLs"
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'charts/controlplane-operations/alerts/**.yaml'
+
+env:
+  ALERTS_DIR: charts/controlplane-operations/alerts
+
+jobs:
+  playbook-urls:
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Every playbook URL must match the canonical docs-site pattern
+        run: |
+          bad=0
+          while IFS= read -r url; do
+            if ! printf '%s' "$url" | grep -qE '^https://operations\.global\.cloud\.sap/docs/support/playbook/[a-z0-9-]+/$'; then
+              echo "::error::Non-canonical playbook URL: $url"
+              bad=1
+            fi
+          done < <(
+            grep -rho 'playbook:[[:space:]]*[^[:space:]#]\+' "$ALERTS_DIR" \
+              | sed 's/^playbook:[[:space:]]*//'
+          )
+          if [ "$bad" -ne 0 ]; then
+            echo ""
+            echo "Every playbook: value must match:"
+            echo "  https://operations.global.cloud.sap/docs/support/playbook/<slug>/"
+            exit 1
+          fi
+          echo "OK: all playbook URLs match the canonical pattern"
+
+      - name: Every alert rule must have exactly one playbook value
+        run: |
+          alert_count=$(grep -rho '^[[:space:]]*-[[:space:]]*alert:' "$ALERTS_DIR" | wc -l)
+          playbook_count=$(grep -rho '^[[:space:]]*playbook:' "$ALERTS_DIR" | wc -l)
+          if [ "$alert_count" -ne "$playbook_count" ]; then
+            echo "::error::Mismatch: $alert_count alert rules but $playbook_count playbook: values"
+            echo "Every alert rule must have exactly one playbook: label."
+            grep -rn '^[[:space:]]*-[[:space:]]*alert:' "$ALERTS_DIR"
+            exit 1
+          fi
+          echo "OK: $alert_count alert rules, $playbook_count playbook: values"
+
+      - name: No unresolved playbook TODOs
+        run: |
+          if grep -rn '#TODO' "$ALERTS_DIR"; then
+            echo ""
+            echo "::error::Found '#TODO' comment(s) in the alerts. Write the playbook and drop the TODO before merging."
+            exit 1
+          fi
+          echo "OK: no #TODO comments"
+
+  # Liveness is checked separately and NON-blocking: the docs site
+  # (operations.global.cloud.sap) may be unreachable from GitHub runners, and a
+  # freshly added playbook 404s until the docs site redeploys. A dead link
+  # should warn, not wedge every alert PR.
+  playbook-urls-reachable:
+    runs-on: [ubuntu-latest]
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Warn on playbook URLs that do not resolve
+        run: |
+          bad=0
+          while IFS= read -r url; do
+            if ! curl --fail --silent --show-error --location --max-time 15 --output /dev/null "$url"; then
+              echo "::warning::Playbook URL does not resolve (may be a pending docs deploy or an unreachable host): $url"
+              bad=1
+            fi
+          done < <(
+            grep -rho 'playbook:[[:space:]]*[^[:space:]#]\+' "$ALERTS_DIR" \
+              | sed 's/^playbook:[[:space:]]*//' \
+              | sort -u
+          )
+          [ "$bad" -eq 0 ] && echo "OK: all playbook URLs resolve"
+          exit 0

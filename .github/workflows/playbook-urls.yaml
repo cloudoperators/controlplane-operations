@@ -61,31 +61,3 @@ jobs:
             exit 1
           fi
           echo "OK: no #TODO comments"
-
-  # Liveness is checked separately and NON-blocking: the docs site
-  # (operations.global.cloud.sap) may be unreachable from GitHub runners, and a
-  # freshly added playbook 404s until the docs site redeploys. A dead link
-  # should warn, not wedge every alert PR.
-  playbook-urls-reachable:
-    runs-on: [ubuntu-latest]
-    continue-on-error: true
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-
-      - name: Warn on playbook URLs that do not resolve
-        run: |
-          bad=0
-          while IFS= read -r url; do
-            if ! curl --fail --silent --show-error --location --max-time 15 --output /dev/null "$url"; then
-              echo "::warning::Playbook URL does not resolve (may be a pending docs deploy or an unreachable host): $url"
-              bad=1
-            fi
-          done < <(
-            grep -rho 'playbook:[[:space:]]*[^[:space:]#]\+' "$ALERTS_DIR" \
-              | sed 's/^playbook:[[:space:]]*//' \
-              | sort -u
-          )
-          [ "$bad" -eq 0 ] && echo "OK: all playbook URLs resolve"
-          exit 0

@@ -1,0 +1,49 @@
+groups:
+- name: controlplane-encryption
+  rules:
+{{- if not (.Values.prometheusRules.disabled.EtcdEncryptionRotationOverdue | default false) }}
+  # Fires when the encryption rotation CronJob has not succeeded for more than
+  # 120 days (90-day rotation interval + 30-day grace period). This means the
+  # encryption key is stale and may violate compliance requirements.
+  - alert: EtcdEncryptionRotationOverdue
+    expr: >
+      (
+        time() - kube_cronjob_status_last_successful_time{cronjob="etcd-kcp-backup-encryption-rotate"}
+      ) > 120 * 24 * 3600
+    for: 1h
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "EtcdEncryptionRotationOverdue" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/etcd-encryption-rotation-overdue/
+      service: {{ dig "EtcdEncryptionRotationOverdue" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "EtcdEncryptionRotationOverdue" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: >
+        etcd encryption key rotation CronJob {{`{{ $labels.namespace }}`}}/{{`{{ $labels.cronjob }}`}}
+        on cluster {{`{{ $labels.cluster }}`}} has not completed successfully for more than 120 days.
+        The encryption key is overdue for rotation. Check CronJob status and pod logs.
+      summary: etcd encryption key rotation overdue on {{`{{ $labels.cluster }}`}}.
+{{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.EtcdEncryptionRotationJobFailed | default false) }}
+  # Fires when a rotation Job has failed. Each CronJob invocation advances one
+  # rotation phase, so a failure may leave the cluster in a partially rotated
+  # state that needs investigation.
+  - alert: EtcdEncryptionRotationJobFailed
+    expr: >
+      kube_job_status_failed{job_name=~"etcd-kcp-backup-encryption-rotate-.*"} > 0
+    for: 10m
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "EtcdEncryptionRotationJobFailed" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/etcd-encryption-rotation-job-failed/
+      service: {{ dig "EtcdEncryptionRotationJobFailed" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "EtcdEncryptionRotationJobFailed" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: >
+        etcd encryption key rotation Job {{`{{ $labels.namespace }}`}}/{{`{{ $labels.job_name }}`}}
+        on cluster {{`{{ $labels.cluster }}`}} has failed. This may leave the encryption config
+        in an intermediate state. Check Job logs with
+        kubectl logs job/{{`{{ $labels.job_name }}`}} -n {{`{{ $labels.namespace }}`}}.
+      summary: etcd encryption key rotation Job failed on {{`{{ $labels.cluster }}`}}.
+{{- end }}

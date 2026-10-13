@@ -35,6 +35,23 @@ groups:
       summary: ClusterImport CR in Error state.
 {{- end }}
 
+{{- if not (.Values.prometheusRules.disabled.ArgoraIPPoolImportInError | default false) }}
+  - alert: ArgoraIPPoolImportInError
+    expr: >
+      kube_customresource_ip_pool_import_status{customresource_kind="IPPoolImport",customresource_group="argora.cloud.sap",state=~"Error"}
+      == 1
+    for: {{ dig "ArgoraIPPoolImportInError" "for" "10m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "ArgoraIPPoolImportInError" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/argora-ippoolimport-in-error/
+      service: {{ dig "ArgoraIPPoolImportInError" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "ArgoraIPPoolImportInError" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      description: Argora IPPoolImport CR status is in Error state for more than {{ dig "ArgoraIPPoolImportInError" "for" "10m" .Values.prometheusRules }}.
+      summary: IPPoolImport CR in Error state.
+{{- end }}
+
 {{- if not (.Values.prometheusRules.disabled.ArgoraPodNotReadyError | default false) }}
   - alert: ArgoraPodNotReadyError
     expr: >

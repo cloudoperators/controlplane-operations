@@ -18,10 +18,22 @@ spec:
       required: false
       default: true
       type: bool
-    - name: prometheusRules.ruleSelector
+    - name: prometheusRules.ruleSelectors
       description: Selector for Prometheus rules to be picked up by the Prometheus operator. List of key-value pairs.
       required: false
       type: list
+    - name: prometheusRules.defaultService
+      description: Default service label for alerts.
+      required: false
+      type: string
+    - name: prometheusRules.defaultSupportGroup
+      description: Default support group label for alerts.
+      required: false
+      type: string
+    - name: prometheusRules.ServerStuckInDiscovery
+      description: Configuration for ServerStuckInDiscovery alert.
+      required: false
+      type: map
     - name: prometheusRules.additionalRuleLabels
       description: Additional labels to be added every Prometheus rule. E.g support_group, service
       required: false

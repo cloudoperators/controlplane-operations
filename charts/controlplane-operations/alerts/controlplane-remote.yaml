@@ -228,3 +228,21 @@ groups:
       summary: "Certificate rotation on shoot {{`{{ $labels.namespace }}`}} is being held back by unhealthy ManagedResources."
       description: "webhook-injector observed a non-force certificate rotation reason (expired/san_mismatch/etc.) on shoot {{`{{ $labels.namespace }}`}} but is deferring the rotation because at least one labeled ManagedResource has ResourcesApplied or ResourcesHealthy != True. The existing cert keeps being served; rotation will resume automatically when the MR(s) recover. If the cert reaches NotAfter before that happens, the rotation will proceed anyway with a louder warning log — but webhook calls on shoot-side CRDs may TLS-fail during the gap. Check the webhook-injector logs in namespace {{`{{ $labels.namespace }}`}} for the offending MR names, and the GRM/MR status for the underlying cause."
 {{- end }}
+
+{{- if not (.Values.prometheusRules.disabled.WebhookInjectorCertRotationStuck | default false) }}
+  - alert: WebhookInjectorCertRotationStuck
+    expr: |
+      rate(controller_runtime_reconcile_total{controller="configmap", result="requeue_after", container="webhook-injector"}[5m]) > 0.05
+      or
+      rate(controller_runtime_reconcile_total{controller="configmap", result="error", container="webhook-injector"}[5m]) > 0
+    for: {{ dig "WebhookInjectorCertRotationStuck" "for" "15m" .Values.prometheusRules }}
+    labels:
+      {{ include "controlplane-operations.additionalRuleLabels" . }}
+      severity: {{ dig "WebhookInjectorCertRotationStuck" "severity" "warning" .Values.prometheusRules }}
+      playbook: https://operations.global.cloud.sap/docs/support/playbook/webhook-injector-cert-rotation-stuck/
+      service: {{ dig "WebhookInjectorCertRotationStuck" "service" .Values.prometheusRules.defaultService .Values.prometheusRules }}
+      support_group: {{ dig "WebhookInjectorCertRotationStuck" "support_group" .Values.prometheusRules.defaultSupportGroup .Values.prometheusRules }}
+    annotations:
+      summary: "webhook-injector cert rotation is stuck ({{`{{ $labels.job }}`}})."
+      description: "The {{`{{ $labels.job }}`}} webhook-injector has been reconciling at an abnormally high rate or returning errors for >15 minutes without a clean pass (pod: {{`{{ $labels.pod }}`}}). This may indicate the cert rotation state machine is stuck — commonly caused by a missing RBAC rule preventing the controller from reading CRDs on the shoot cluster, or by a transient shoot apiserver outage. Check pod logs and the rotation-phase annotation on the cert Secret."
+{{- end }}

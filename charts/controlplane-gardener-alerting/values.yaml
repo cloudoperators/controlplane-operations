@@ -1,0 +1,23 @@
+# controlplane-gardener-alerting — values
+#
+# Empty shell. Nothing is rendered yet; every feature below is inert.
+# The MAP, secrets, NetworkPolicy, and Gardener alert rules are added in later
+# phases.
+
+map:
+  # -- Enable the MutatingAdmissionPolicy that injects SCI alerting config into
+  # the Garden Prometheus CR (garden/garden) on the runtime cluster. Off in the
+  # shell; MAP templates are not present yet.
+  enabled: false
+
+  # Future injected fields (documented here for shape; all inert in the shell):
+  #
+  # alertManager:        # spec.additionalAlertManagerConfigs — SCI AM target (mTLS)
+  #   secretName: alertmanager-garden-sci-config
+  #   key: alertmanagers.yaml
+  # relabel:             # spec.additionalAlertRelabelConfigs — support_group/playbook/severity
+  #   secretName: alert-relabel-configs
+  #   key: config.yaml
+  # thanos:              # spec.thanos — sidecar image + objectStorageConfig
+  #   version: ""
+  # externalLabels: {}   # spec.externalLabels — cluster/region/cluster_type

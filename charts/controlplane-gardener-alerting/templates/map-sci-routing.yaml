@@ -1,0 +1,94 @@
+{{- if .Values.map.enabled }}
+# MutatingAdmissionPolicy: route prometheus/garden alerts to the external SCI
+# central Alertmanager. The Gardener operator (installed by this
+# same release) creates and continuously reconciles the `garden` Prometheus CR in
+# the `garden` namespace; this policy mutates the operator's CREATE/UPDATE writes
+# so the SCI routing config survives every reconcile (self-healing).
+#
+# apiVersion is admissionregistration.k8s.io/v1beta1 because MutatingAdmissionPolicy
+# is beta on Kubernetes 1.34 (the current runtime cluster version). The feature gate
+# and the v1beta1 admissionregistration runtime API must be enabled on the runtime
+# cluster's kube-apiserver. Bump to v1 on Kubernetes >= 1.36.
+#
+# All mutations are idempotent so repeated operator reconciles do not accumulate
+# changes: the map merge and the single-value SecretKeySelector fields are
+# replace-safe, and the spec.secrets append is guarded by a CEL existence check.
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: gardener-prometheus-sci-routing
+spec:
+  failurePolicy: Ignore
+  reinvocationPolicy: Never
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ["monitoring.coreos.com"]
+      apiVersions: ["v1"]
+      resources: ["prometheuses"]
+      operations: ["CREATE", "UPDATE"]
+  matchConditions:
+  - name: only-prometheus-garden
+    expression: >
+      object.metadata.name == 'garden' &&
+      object.metadata.namespace == 'garden'
+  mutations:
+  # externalLabels: granular map merge (server-side-apply semantics), so
+  # Gardener's own labels (e.g. landscape) are preserved.
+  - patchType: ApplyConfiguration
+    applyConfiguration:
+      expression: |
+        Object{
+          spec: Object.spec{
+            externalLabels: {
+              "cluster": {{ .Values.map.externalLabels.cluster | quote }},
+              "cluster_type": {{ .Values.map.externalLabels.cluster_type | quote }},
+              "region": {{ .Values.map.externalLabels.region | quote }}
+            }
+          }
+        }
+  # Send path to the external SCI central Alertmanager over mTLS. The config
+  # lives in the alertmanager-garden-sci-config Secret (same namespace); the
+  # client cert is mounted from the tls-prometheus-garden-sci Secret (appended to
+  # spec.secrets below). Operator confirmed to leave this field unset.
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        [JSONPatch{
+          op: "add",
+          path: "/spec/additionalAlertManagerConfigs",
+          value: {"name": {{ .Values.map.alertManager.secretName | quote }}, "key": {{ .Values.map.alertManager.key | quote }}}
+        }]
+  # Relabeling applied to alerts before they are sent. References the
+  # alert-relabel-configs Secret. Operator confirmed to leave this field unset.
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        [JSONPatch{
+          op: "add",
+          path: "/spec/additionalAlertRelabelConfigs",
+          value: {"name": {{ .Values.map.relabel.secretName | quote }}, "key": {{ .Values.map.relabel.key | quote }}}
+        }]
+  # Mount the mTLS client cert into the Prometheus pod at
+  # /etc/prometheus/secrets/tls-prometheus-garden-sci/ so the cert_file/key_file
+  # paths in the Alertmanager config resolve. Guarded so reconciles do not append
+  # duplicate entries.
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        (
+          !has(object.spec.secrets) ?
+            [JSONPatch{op: "add", path: "/spec/secrets", value: ["tls-prometheus-garden-sci"]}]
+          : !object.spec.secrets.exists(s, s == "tls-prometheus-garden-sci") ?
+            [JSONPatch{op: "add", path: "/spec/secrets/-", value: "tls-prometheus-garden-sci"}]
+          : []
+        )
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: gardener-prometheus-sci-routing
+spec:
+  policyName: gardener-prometheus-sci-routing
+  matchResources: {}
+{{- end }}

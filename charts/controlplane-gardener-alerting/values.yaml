@@ -1,23 +1,47 @@
 # controlplane-gardener-alerting — values
-#
-# Empty shell. Nothing is rendered yet; every feature below is inert.
-# The MAP, secrets, NetworkPolicy, and Gardener alert rules are added in later
-# phases.
 
 map:
   # -- Enable the MutatingAdmissionPolicy that injects SCI alerting config into
-  # the Garden Prometheus CR (garden/garden) on the runtime cluster. Off in the
-  # shell; MAP templates are not present yet.
+  # the Garden Prometheus CR (garden/garden) on the runtime cluster.
   enabled: false
 
-  # Future injected fields (documented here for shape; all inert in the shell):
-  #
-  # alertManager:        # spec.additionalAlertManagerConfigs — SCI AM target (mTLS)
-  #   secretName: alertmanager-garden-sci-config
-  #   key: alertmanagers.yaml
-  # relabel:             # spec.additionalAlertRelabelConfigs — support_group/playbook/severity
-  #   secretName: alert-relabel-configs
-  #   key: config.yaml
-  # thanos:              # spec.thanos — sidecar image + objectStorageConfig
-  #   version: ""
-  # externalLabels: {}   # spec.externalLabels — cluster/region/cluster_type
+  rolloutTriggerJob:
+    # -- Deploy the post-install/post-upgrade trigger Job that activates the MAP
+    # by patching an annotation onto prometheus/garden. ONE-TIME USE: set to false
+    # once the MAP rollout is complete.
+    enabled: true
+
+  externalLabels:
+    # -- cluster, region, cluster_type are merged into prometheus/garden
+    # spec.externalLabels by the MAP. Gardener's own labels (e.g. landscape) are
+    # preserved. Must be set per deployment target.
+    cluster: ""
+    region: ""
+    cluster_type: ""
+
+  thanos:
+    # -- Thanos sidecar image tag. Matches kube-prometheus-stack default.
+    # Update when bumping the kube-monitoring chart.
+    version: v0.42.4
+
+  kubectl:
+    # -- kubectl image tag for the rollout trigger Job.
+    # Pin to match the runtime cluster's Kubernetes version.
+    version: v1.34.8
+
+  alertManager:
+    # -- Secret name and key for spec.additionalAlertManagerConfigs.
+    secretName: alertmanager-garden-sci-config
+    key: alertmanagers.yaml
+    # -- SCI central Alertmanager targets (list of hostnames).
+    targets:
+      - alertmanager-internal.scaleout.eu-de-1.cloud.sap
+      - alertmanager-internal.scaleout.eu-nl-1.cloud.sap
+
+  relabel:
+    # -- Secret name and key for spec.additionalAlertRelabelConfigs.
+    secretName: alert-relabel-configs
+    key: config.yaml
+    # -- Base URL for playbook links. Alertname (lowercased) is appended as the
+    # final path segment.
+    playbookBaseURL: https://operations.global.cloud.sap/docs/container/kubernetes/gardener

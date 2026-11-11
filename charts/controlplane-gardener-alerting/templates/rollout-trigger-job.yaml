@@ -1,0 +1,100 @@
+{{- if and .Values.map.enabled .Values.map.rolloutTriggerJob.enabled }}
+# MAP activation trigger.
+#
+# ONE-TIME USE: once the MAP rollout is complete, set
+# map.rolloutTriggerJob.enabled: false to stop deploying this job.
+#
+# A MutatingAdmissionPolicy fires only on CREATE/UPDATE; the Prometheus CR the
+# operator already created is not retroactively mutated. This Helm
+# post-install,post-upgrade hook Job JSON-patches an annotation onto
+# prometheus/garden so the mutation happens as part of the Helm release — no
+# out-of-band kubectl, no manual step. The annotation value is the Helm revision,
+# distinct on every upgrade, so re-running the release always fires a fresh
+# UPDATE. Thereafter ordinary Gardener operator reconciles keep it stamped (the
+# MAP runs on the operator's writes too — self-healing).
+#
+# Hook weight 10 installs RBAC before the Job (weight 20). before-hook-creation
+# cleanup prevents orphaned resources when an upgrade is interrupted.
+# The MAP + its Binding are non-hook resources, installed in the main release
+# phase before these post-install hooks run, so the policy is already registered
+# when the patch fires. If prometheus/garden does not exist yet on a first
+# install, the Job retries (restartPolicy OnFailure) until the operator has
+# created it.
+#
+# The ~1 in the JSON Patch path escapes the / in the annotation key.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: map-rollout-trigger
+  namespace: garden
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "10"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: map-rollout-trigger
+  namespace: garden
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "10"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+rules:
+- apiGroups: ["monitoring.coreos.com"]
+  resources: ["prometheuses"]
+  verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: map-rollout-trigger
+  namespace: garden
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "10"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: map-rollout-trigger
+subjects:
+- kind: ServiceAccount
+  name: map-rollout-trigger
+  namespace: garden
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: map-rollout-trigger
+  namespace: garden
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-weight: "20"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 120
+  backoffLimit: 20
+  template:
+    metadata:
+      labels:
+        app: map-rollout-trigger
+    spec:
+      serviceAccountName: map-rollout-trigger
+      restartPolicy: OnFailure
+      containers:
+      - name: trigger
+        image: keppel.global.cloud.sap/ccloud-registry-k8s-io-mirror/kubectl:{{ .Values.map.kubectl.version }}
+        command:
+        - kubectl
+        - patch
+        - prometheus
+        - garden
+        - -n
+        - garden
+        - --type=json
+        - -p
+        - '[{"op":"add","path":"/metadata/annotations/sci.rollout~1trigger","value":"{{ .Release.Revision }}"}]'
+{{- end }}

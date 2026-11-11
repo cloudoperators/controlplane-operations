@@ -3,7 +3,7 @@ kind: PluginDefinition
 metadata:
   name: controlplane-gardener-alerting
 spec:
-  version: "0.1.0"
+  version: "0.1.1"
   displayName: Controlplane Gardener Alerting
   description: >-
     Integration between the Gardener Prometheus alerting stack and SCI
@@ -15,5 +15,5 @@ spec:
   helmChart:
     name: controlplane-gardener-alerting
     repository: oci://ghcr.io/cloudoperators/controlplane-operations/charts
-    version: "0.1.0"
+    version: "0.1.1"
   options: []

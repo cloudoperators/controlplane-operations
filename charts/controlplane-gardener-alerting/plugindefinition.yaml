@@ -1,0 +1,19 @@
+apiVersion: greenhouse.sap/v1alpha1
+kind: PluginDefinition
+metadata:
+  name: controlplane-gardener-alerting
+spec:
+  version: "0.1.0"
+  displayName: Controlplane Gardener Alerting
+  description: >-
+    Integration between the Gardener Prometheus alerting stack and SCI
+    Alertmanager. Hosts alert rules that target Gardener Prometheus. Packaged as a
+    separate plugin because its deployment target differs from the
+    controlplane-operations plugin — scoped to runtime clusters where the
+    Gardener operator runs.
+  docMarkDownUrl: https://raw.githubusercontent.com/cloudoperators/controlplane-operations/main/charts/controlplane-gardener-alerting/README.md
+  helmChart:
+    name: controlplane-gardener-alerting
+    repository: oci://ghcr.io/cloudoperators/controlplane-operations/charts
+    version: "0.1.0"
+  options: []

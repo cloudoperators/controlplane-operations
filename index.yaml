@@ -1,5 +1,23 @@
 apiVersion: v1
 entries:
+  controlplane-gardener-alerting:
+  - apiVersion: v2
+    created: "2026-11-11T10:25:20.558050551Z"
+    description: Integration between the Gardener Prometheus alerting and SCI alerting
+      stack. Hosts alert rules that target Gardener Prometheus. Packaged into a separate
+      chart (and plugin) because its deployment target differs from the controlplane-operations
+      chart — scoped to runtime clusters where the Gardener operator runs.
+    digest: 25f57bd972200a465db255bd5c958532e8e582726f4e261be087dae6bfbfe92b
+    keywords:
+    - Helm Chart
+    - Controlplane operations
+    - Gardener
+    - Garden Prometheus
+    - Prometheus Alerting
+    name: controlplane-gardener-alerting
+    urls:
+    - https://github.com/cloudoperators/controlplane-operations/releases/download/controlplane-gardener-alerting-0.1.0/controlplane-gardener-alerting-0.1.0.tgz
+    version: 0.1.0
   controlplane-operations:
   - apiVersion: v2
     created: "2026-10-23T07:59:54.98657949Z"
@@ -742,4 +760,4 @@ entries:
     urls:
     - https://github.com/cloudoperators/controlplane-operations/releases/download/controlplane-operations-1.0.9/controlplane-operations-1.0.9.tgz
     version: 1.0.9
-generated: "2026-10-23T07:59:54.986743538Z"
+generated: "2026-11-11T10:25:20.558137293Z"

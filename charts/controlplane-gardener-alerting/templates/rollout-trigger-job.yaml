@@ -6,12 +6,13 @@
 #
 # A MutatingAdmissionPolicy fires only on CREATE/UPDATE; the Prometheus CR the
 # operator already created is not retroactively mutated. This Helm
-# post-install,post-upgrade hook Job JSON-patches an annotation onto
-# prometheus/garden so the mutation happens as part of the Helm release — no
-# out-of-band kubectl, no manual step. The annotation value is the Helm revision,
-# distinct on every upgrade, so re-running the release always fires a fresh
-# UPDATE. Thereafter ordinary Gardener operator reconciles keep it stamped (the
-# MAP runs on the operator's writes too — self-healing).
+# post-install,post-upgrade hook Job that activates the MAP by patching an
+# annotation onto prometheus/garden. Uses a merge patch so the annotations map
+# is created when absent (JSON Patch `add` on a missing parent fails).
+# The annotation value is the Helm revision, distinct on every upgrade, so
+# re-running the release always fires a fresh UPDATE. Thereafter ordinary
+# Gardener operator reconciles keep it stamped (the MAP runs on the operator's
+# writes too — self-healing).
 #
 # Hook weight 10 installs RBAC before the Job (weight 20). before-hook-creation
 # cleanup prevents orphaned resources when an upgrade is interrupted.
@@ -94,7 +95,7 @@ spec:
         - garden
         - -n
         - garden
-        - --type=json
+        - --type=merge
         - -p
-        - '[{"op":"add","path":"/metadata/annotations/sci.rollout~1trigger","value":"{{ .Release.Revision }}"}]'
+        - '{"metadata":{"annotations":{"sci.rollout/trigger":"{{ .Release.Revision }}"}}}'
 {{- end }}

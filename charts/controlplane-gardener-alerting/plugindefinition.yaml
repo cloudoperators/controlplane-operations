@@ -16,4 +16,35 @@ spec:
     name: controlplane-gardener-alerting
     repository: oci://ghcr.io/cloudoperators/controlplane-operations/charts
     version: "0.2.0"
-  options: []
+  options:
+    - name: map.enabled
+      description: Enable the MutatingAdmissionPolicy that injects SCI alerting config into the Garden Prometheus CR.
+      required: false
+      default: false
+      type: bool
+    - name: map.externalLabels.cluster
+      description: Runtime cluster name, merged into prometheus/garden spec.externalLabels (e.g. rt-qa-de-1).
+      required: true
+      type: string
+    - name: map.externalLabels.region
+      description: Region, merged into prometheus/garden spec.externalLabels (e.g. qa-de-1).
+      required: true
+      type: string
+    - name: map.externalLabels.cluster_type
+      description: Cluster type label, merged into prometheus/garden spec.externalLabels.
+      required: false
+      default: sci-k8s-runtime
+      type: string
+    - name: map.rolloutTriggerJob.enabled
+      description: Deploy the post-install/post-upgrade trigger Job. Set to false once the MAP rollout is complete.
+      required: false
+      default: true
+      type: bool
+    - name: map.thanos.version
+      description: Thanos sidecar image tag injected into prometheus/garden spec.thanos.
+      required: false
+      type: string
+    - name: map.kubectl.version
+      description: kubectl image tag for the rollout trigger Job. Pin to the runtime cluster's Kubernetes version.
+      required: false
+      type: string

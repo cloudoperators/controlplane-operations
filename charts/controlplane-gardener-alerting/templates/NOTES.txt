@@ -1,3 +1,0 @@
-controlplane-gardener-alerting {{ .Chart.Version }} deployed as an empty shell.
-
-No resources are rendered yet. Configuration and alert rules land in later phases.

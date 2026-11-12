@@ -1,0 +1,50 @@
+{{- if .Values.map.enabled }}
+# MutatingAdmissionPolicy: enable the Thanos sidecar on prometheus/garden.
+# Sets spec.thanos with an image only, which makes prometheus-operator inject the
+# Thanos sidecar (StoreAPI on :10901). No objectStorageConfig yet, so the sidecar
+# runs but does not upload blocks to object storage.
+#
+# Independent of the routing policy, so it can be removed on its own. Idempotent
+# via the thanos-not-present match condition.
+#
+# See map-sci-routing.yaml for the apiVersion / feature-gate note.
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: gardener-prometheus-thanos
+spec:
+  failurePolicy: Ignore
+  reinvocationPolicy: Never
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ["monitoring.coreos.com"]
+      apiVersions: ["v1"]
+      resources: ["prometheuses"]
+      operations: ["CREATE", "UPDATE"]
+  matchConditions:
+  - name: only-prometheus-garden
+    expression: >
+      object.metadata.name == 'garden' &&
+      object.metadata.namespace == 'garden'
+  - name: thanos-not-present
+    expression: >
+      !has(object.spec.thanos)
+  mutations:
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        [JSONPatch{
+          op: "add",
+          path: "/spec/thanos",
+          value: {"image": "keppel.global.cloud.sap/ccloud-quay-mirror/thanos/thanos:{{ .Values.map.thanos.version }}"}
+        }]
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: gardener-prometheus-thanos
+spec:
+  policyName: gardener-prometheus-thanos
+  matchResources: {}
+{{- end }}

@@ -18,9 +18,8 @@ map:
     cluster: ""
     region: ""
     cluster_type: ""
-    # -- Stable discriminator identifying the garden-Prometheus alert source at
-    # the SCI Alertmanager (dedup/routing during the metrics-gardener dual-run).
-    # Survives relabeling and outlives metrics-gardener.
+    # -- stable discriminator identifying the garden-Prometheus alert source in
+    # downstream consumers, if necessary
     alert_source: garden-prometheus
 
   thanos:

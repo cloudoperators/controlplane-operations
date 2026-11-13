@@ -3,7 +3,7 @@ kind: PluginDefinition
 metadata:
   name: controlplane-gardener-alerting
 spec:
-  version: "0.2.0"
+  version: "0.3.0"
   displayName: Controlplane Gardener Alerting
   description: >-
     Integration between the Gardener Prometheus alerting stack and SCI
@@ -15,7 +15,7 @@ spec:
   helmChart:
     name: controlplane-gardener-alerting
     repository: oci://ghcr.io/cloudoperators/controlplane-operations/charts
-    version: "0.2.0"
+    version: "0.3.0"
   options:
     - name: map.enabled
       description: Enable the MutatingAdmissionPolicy that injects SCI alerting config into the Garden Prometheus CR.

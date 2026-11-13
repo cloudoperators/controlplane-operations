@@ -45,3 +45,17 @@ map:
     # -- Base URL for playbook links. Alertname (lowercased) is appended as the
     # final path segment.
     playbookBaseURL: https://operations.global.cloud.sap/docs/container/kubernetes/gardener
+
+objectStorage:
+  # -- Enable the Thanos sidecar object storage config. Set to true once the
+  # Swift/Ceph storage cluster is reachable from the runtime cluster. When false,
+  # the sidecar starts in StoreAPI-only mode (live data, no block uploads).
+  enabled: false
+  # -- Name of the Secret in the `garden` namespace that holds the objstore config.
+  secretName: thanos-garden-objstore
+  # -- Key within the Secret that contains the Thanos objstore config.
+  secretKey: objstore.yml
+  # -- Thanos objstore config content (see https://github.com/thanos-io/objstore
+  # for supported providers and schema). Supply credentials as deploy-time secret
+  # references rather than inline literals.
+  config: ""

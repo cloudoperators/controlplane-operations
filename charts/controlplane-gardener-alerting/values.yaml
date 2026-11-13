@@ -18,6 +18,9 @@ map:
     cluster: ""
     region: ""
     cluster_type: ""
+    # -- stable discriminator identifying the garden-Prometheus alert source in
+    # downstream consumers, if necessary
+    alert_source: garden-prometheus
 
   thanos:
     # -- Thanos sidecar image tag. Matches kube-prometheus-stack default.

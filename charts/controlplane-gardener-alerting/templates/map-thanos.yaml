@@ -47,4 +47,52 @@ metadata:
 spec:
   policyName: gardener-prometheus-thanos
   matchResources: {}
+{{- if .Values.objectStorage.enabled }}
+# MutatingAdmissionPolicy: inject objectStorageConfig into an already-injected
+# spec.thanos. Runs after gardener-prometheus-thanos (alphabetical MAP ordering),
+# so on initial create both fire in sequence: phase-1 sets spec.thanos, phase-2
+# sees it and adds objectStorageConfig. Idempotent via the match condition.
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: gardener-prometheus-thanos-objstore
+spec:
+  failurePolicy: Ignore
+  reinvocationPolicy: Never
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ["monitoring.coreos.com"]
+      apiVersions: ["v1"]
+      resources: ["prometheuses"]
+      operations: ["CREATE", "UPDATE"]
+  matchConditions:
+  - name: only-prometheus-garden
+    expression: >
+      object.metadata.name == 'garden' &&
+      object.metadata.namespace == 'garden'
+  - name: thanos-present-without-objstore
+    expression: >
+      has(object.spec.thanos) && !has(object.spec.thanos.objectStorageConfig)
+  mutations:
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        [JSONPatch{
+          op: "add",
+          path: "/spec/thanos/objectStorageConfig",
+          value: {
+            "name": {{ .Values.objectStorage.secretName | quote }},
+            "key": {{ .Values.objectStorage.secretKey | quote }}
+          }
+        }]
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: gardener-prometheus-thanos-objstore
+spec:
+  policyName: gardener-prometheus-thanos-objstore
+  matchResources: {}
+{{- end }}
 {{- end }}

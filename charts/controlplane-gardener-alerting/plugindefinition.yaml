@@ -3,7 +3,7 @@ kind: PluginDefinition
 metadata:
   name: controlplane-gardener-alerting
 spec:
-  version: "0.3.0"
+  version: "0.4.0"
   displayName: Controlplane Gardener Alerting
   description: >-
     Integration between the Gardener Prometheus alerting stack and SCI
@@ -15,25 +15,24 @@ spec:
   helmChart:
     name: controlplane-gardener-alerting
     repository: oci://ghcr.io/cloudoperators/controlplane-operations/charts
-    version: "0.3.0"
+    version: "0.4.0"
   options:
     - name: map.enabled
-      description: Enable the MutatingAdmissionPolicy that injects SCI alerting config into the Garden Prometheus CR.
+      description: Enable the MutatingAdmissionPolicy that injects the alerting configuration into the Garden Prometheus CR.
       required: false
       default: false
       type: bool
     - name: map.externalLabels.cluster
-      description: Runtime cluster name, merged into prometheus/garden spec.externalLabels (e.g. rt-qa-de-1).
+      description: Runtime cluster name, merged into prometheus/garden spec.externalLabels.
       required: true
       type: string
     - name: map.externalLabels.region
-      description: Region, merged into prometheus/garden spec.externalLabels (e.g. qa-de-1).
+      description: Region, merged into prometheus/garden spec.externalLabels.
       required: true
       type: string
     - name: map.externalLabels.cluster_type
       description: Cluster type label, merged into prometheus/garden spec.externalLabels.
       required: false
-      default: sci-k8s-runtime
       type: string
     - name: map.rolloutTriggerJob.enabled
       description: Deploy the post-install/post-upgrade trigger Job. Set to false once the MAP rollout is complete.
@@ -46,5 +45,22 @@ spec:
       type: string
     - name: map.kubectl.version
       description: kubectl image tag for the rollout trigger Job. Pin to the runtime cluster's Kubernetes version.
+      required: false
+      type: string
+    - name: objectStorage.enabled
+      description: Enable the Thanos sidecar object storage config. When false, the sidecar serves live data over StoreAPI only (no block uploads). Flip to true once the object storage cluster is reachable.
+      required: false
+      default: false
+      type: bool
+    - name: objectStorage.secretName
+      description: Name of the Secret in the garden namespace holding the Thanos objstore config.
+      required: false
+      type: string
+    - name: objectStorage.secretKey
+      description: Key within the objstore Secret that contains the config.
+      required: false
+      type: string
+    - name: objectStorage.config
+      description: Thanos objstore config content. Supply credentials as deploy-time secret references rather than inline literals.
       required: false
       type: string

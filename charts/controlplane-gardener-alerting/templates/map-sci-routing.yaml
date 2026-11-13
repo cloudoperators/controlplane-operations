@@ -43,7 +43,8 @@ spec:
             externalLabels: {
               "cluster": {{ .Values.map.externalLabels.cluster | quote }},
               "cluster_type": {{ .Values.map.externalLabels.cluster_type | quote }},
-              "region": {{ .Values.map.externalLabels.region | quote }}
+              "region": {{ .Values.map.externalLabels.region | quote }},
+              "alert_source": {{ .Values.map.externalLabels.alert_source | quote }}
             }
           }
         }

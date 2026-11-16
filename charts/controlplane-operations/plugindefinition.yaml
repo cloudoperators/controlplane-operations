@@ -30,11 +30,6 @@ spec:
       description: Labels for Gardener-specific Prometheus rules
       required: false
       type: map
-    - name: podMonitors.create
-      description: Create PodMonitor resources (e.g. calico bird-exporter for BGP metrics)
-      required: false
-      default: false
-      type: bool
     - name: dashboards.create
       description: Create Plutono dashboards
       required: false

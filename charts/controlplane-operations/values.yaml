@@ -56,13 +56,6 @@ prometheusRules:
   #   for: "10m"
   #   severity: "warning"
 
-## Create PodMonitor resources for scraping metrics from pods
-##
-podMonitors:
-
-  ## Enables PodMonitor resources to be created
-  create: false
-
 ## Create default dashboards for monitoring the cluster
 ##
 dashboards:

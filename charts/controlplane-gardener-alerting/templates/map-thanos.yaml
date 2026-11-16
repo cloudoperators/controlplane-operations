@@ -47,7 +47,7 @@ metadata:
 spec:
   policyName: gardener-prometheus-thanos
   matchResources: {}
-{{- if .Values.objectStorage.enabled }}
+{{- if .Values.map.thanos.objectStorage.enabled }}
 # MutatingAdmissionPolicy: inject or update objectStorageConfig in an already-injected
 # spec.thanos. Fires on every CR UPDATE so secretName/secretKey changes self-reconcile
 # on the next Gardener operator reconcile cycle — no manual re-trigger needed.
@@ -81,8 +81,8 @@ spec:
           op: "add",
           path: "/spec/thanos/objectStorageConfig",
           value: {
-            "name": {{ .Values.objectStorage.secretName | quote }},
-            "key": {{ .Values.objectStorage.secretKey | quote }}
+            "name": {{ .Values.map.thanos.objectStorage.secretName | quote }},
+            "key": {{ .Values.map.thanos.objectStorage.secretKey | quote }}
           }
         }]
 ---

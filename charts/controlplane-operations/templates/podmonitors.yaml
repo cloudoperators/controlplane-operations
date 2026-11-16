@@ -1,0 +1,29 @@
+{{- if .Values.podMonitors.create -}}
+{{- $root := . -}}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ .Release.Name }}-calico-bird-exporter
+  labels:
+{{ include "controlplane-operations.ruleSelectorLabels" (list "" $root) | indent 4 }}
+{{ include "controlplane-operations.labels" (list "" $root) | indent 4 }}
+spec:
+  namespaceSelector:
+    matchNames:
+      - kube-system
+  podMetricsEndpoints:
+    - port: bird-metrics
+      relabelings:
+        - action: replace
+          sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: node
+        - action: replace
+          sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: pod
+        - action: replace
+          sourceLabels: [__meta_kubernetes_namespace]
+          targetLabel: namespace
+  selector:
+    matchLabels:
+      k8s-app: calico-node
+{{- end }}

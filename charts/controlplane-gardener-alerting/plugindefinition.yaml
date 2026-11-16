@@ -34,11 +34,6 @@ spec:
       description: Cluster type label, merged into prometheus/garden spec.externalLabels.
       required: false
       type: string
-    - name: map.rolloutTriggerJob.enabled
-      description: Deploy the post-install/post-upgrade trigger Job. Set to false once the MAP rollout is complete.
-      required: false
-      default: true
-      type: bool
     - name: map.thanos.version
       description: Thanos sidecar image tag injected into prometheus/garden spec.thanos.
       required: false

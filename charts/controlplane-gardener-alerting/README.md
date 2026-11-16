@@ -23,10 +23,10 @@ CREATE/UPDATE writes to the CR. Every reconcile re-applies the injected fields
 (self-healing).
 
 A MAP only fires on CREATE/UPDATE, and the operator has usually already created
-the CR by the time this chart is installed. The one-time rollout-trigger Job
-(`map.rolloutTriggerJob.enabled`) patches an annotation onto the CR to force a
-fresh UPDATE so the MAPs apply to the existing object. After the first rollout
-it can be disabled.
+the CR by the time this chart is installed. The rollout-trigger Job
+(`rollout-trigger-job.yaml`) patches an annotation onto the CR on every chart
+install/upgrade to force a fresh UPDATE so the MAPs apply immediately to the
+existing object. No flag — it always runs when `map.enabled` is true.
 
 ### Rendered resources (all gated on `map.enabled`)
 
@@ -38,8 +38,8 @@ it can be disabled.
 | `secret-alert-relabel-configs.yaml` | The `additionalAlertRelabelConfigs` payload (support_group, playbook URL, severity downgrade). |
 | `secret-thanos-objstore.yaml` | The Thanos objstore config Secret. Rendered only when `objectStorage.enabled`. |
 | `network-policy-thanos-grpc.yaml` | Allows an external Thanos Query to reach the garden Prometheus sidecar on `:10901` (the `garden` namespace is deny-all). |
-| `network-policy-rollout-trigger.yaml` | Egress for the rollout-trigger Job to the API server. Gated also on `map.rolloutTriggerJob.enabled`. |
-| `rollout-trigger-job.yaml` | One-time Job (+ RBAC) that annotates the CR to activate the MAPs. Gated also on `map.rolloutTriggerJob.enabled`. |
+| `network-policy-rollout-trigger.yaml` | Egress for the rollout-trigger Job to the API server. |
+| `rollout-trigger-job.yaml` | Post-install/post-upgrade Job (+ RBAC) that annotates the CR to activate the MAPs on every chart release. |
 
 ## Configuration
 
@@ -48,7 +48,6 @@ it can be disabled.
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `map.enabled` | bool | `false` | Master switch. Enables the MAPs, Secrets, NetworkPolicies, and rollout Job. Everything in this chart is gated on it. |
-| `map.rolloutTriggerJob.enabled` | bool | `true` | Deploy the post-install/post-upgrade trigger Job that activates the MAP. **One-time use** — set to `false` once the initial rollout is complete. |
 | `map.externalLabels.cluster` | string | `""` | Runtime cluster name, merged into CR `spec.externalLabels`. Must be set per target. |
 | `map.externalLabels.region` | string | `""` | Region, merged into `spec.externalLabels`. Must be set per target. |
 | `map.externalLabels.cluster_type` | string | `""` | Cluster-type label, merged into `spec.externalLabels`. |
@@ -102,11 +101,10 @@ data. No blocks are uploaded; there is no long-term retention yet.
 injects `objectStorageConfig` into `spec.thanos` on every CR UPDATE, so the
 sidecar begins uploading blocks once the Gardener operator reconciles the CR.
 
-> **Initial phase-2 trigger.** A MAP only mutates on a CR write. If
-> `map.rolloutTriggerJob.enabled` was set to `false` after phase 1, the
-> phase-2 MAP is installed but waits for the next Gardener reconcile cycle
-> (usually within minutes) to fire. Re-enable `map.rolloutTriggerJob.enabled`
-> for one cycle if you need it applied immediately.
+> **Initial phase-2 trigger.** A MAP only mutates on a CR write. The
+> rollout-trigger Job runs on every chart upgrade, so flipping
+> `objectStorage.enabled` triggers an immediate admission on the next chart
+> deploy. No manual action needed.
 
 **Changing secretName/secretKey** after phase 2 is safe: the phase-2 MAP
 reconciles `objectStorageConfig` on every Gardener UPDATE, so the new selector
@@ -127,8 +125,6 @@ credentials as deploy-time secret references rather than inline literals.
 ```yaml
 map:
   enabled: true
-  rolloutTriggerJob:
-    enabled: true   # set false after the first successful rollout
   externalLabels:
     cluster: <cluster-name>
     region: <region>

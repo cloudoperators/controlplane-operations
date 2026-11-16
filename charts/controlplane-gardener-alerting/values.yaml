@@ -5,12 +5,6 @@ map:
   # the Garden Prometheus CR (garden/garden) on the runtime cluster.
   enabled: false
 
-  rolloutTriggerJob:
-    # -- Deploy the post-install/post-upgrade trigger Job that activates the MAP
-    # by patching an annotation onto prometheus/garden. ONE-TIME USE: set to false
-    # once the MAP rollout is complete.
-    enabled: true
-
   externalLabels:
     # -- cluster, region, cluster_type are merged into prometheus/garden
     # spec.externalLabels by the MAP. Gardener's own labels (e.g. landscape) are

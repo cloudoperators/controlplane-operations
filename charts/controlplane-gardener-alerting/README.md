@@ -52,6 +52,7 @@ it can be disabled.
 | `map.externalLabels.cluster` | string | `""` | Runtime cluster name, merged into CR `spec.externalLabels`. Must be set per target. |
 | `map.externalLabels.region` | string | `""` | Region, merged into `spec.externalLabels`. Must be set per target. |
 | `map.externalLabels.cluster_type` | string | `""` | Cluster-type label, merged into `spec.externalLabels`. |
+| `map.thanos.image` | string | `keppel.global.cloud.sap/ccloud-quay-mirror/thanos/thanos` | Thanos sidecar image registry/repository injected into `spec.thanos`. |
 | `map.thanos.version` | string | `v0.42.4` | Thanos sidecar image tag injected into `spec.thanos`. Keep aligned with the monitoring stack's Thanos version. |
 | `map.kubectl.version` | string | `v1.34.8` | kubectl image tag for the rollout-trigger Job. Pin to the runtime cluster's Kubernetes version. |
 
@@ -99,9 +100,23 @@ data. No blocks are uploaded; there is no long-term retention yet.
 **Phase 2 — storage available.** Flip `objectStorage.enabled: true` and supply
 `objectStorage.config`. The second MAP adds `objectStorageConfig` to the
 already-injected `spec.thanos`, the sidecar begins uploading blocks, and the
-Store Gateway serves history. No other change is needed — the two MAPs chain by
-CEL match condition (phase 1 fires when `spec.thanos` is absent; phase 2 fires
-when `spec.thanos` exists but lacks `objectStorageConfig`).
+Store Gateway serves history. The two MAPs chain by CEL match condition (phase 1
+fires when `spec.thanos` is absent; phase 2 fires when `spec.thanos` exists but
+lacks `objectStorageConfig`).
+
+> **Re-trigger required.** A MAP only mutates on a CR write. If
+> `map.rolloutTriggerJob.enabled` was set to `false` after phase 1, flipping
+> `objectStorage.enabled` installs the phase-2 policy and Secret but nothing
+> rewrites the Garden Prometheus CR, so `objectStorageConfig` is never injected.
+> Re-enable `map.rolloutTriggerJob.enabled: true` for the phase-2 rollout (or
+> patch the CR manually to force an admission).
+>
+> **Changing or disabling later is not auto-reconciled.** The phase-2 MAP only
+> *adds* the config when absent. Changing `objectStorage.secretName`/`secretKey`
+> after phase 2 leaves the CR pointing at the old selector; setting
+> `objectStorage.enabled: false` deletes the Secret but leaves
+> `spec.thanos.objectStorageConfig` on the CR, referencing a now-missing Secret.
+> Both need a manual `kubectl patch` of the CR to update or remove the field.
 
 The `objectStorage.config` value is a Thanos objstore config document (see the
 [supported providers](https://github.com/thanos-io/objstore)); supply

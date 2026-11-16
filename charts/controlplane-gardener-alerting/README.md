@@ -51,7 +51,6 @@ existing object. No flag — it always runs when `map.enabled` is true.
 | `map.externalLabels.cluster` | string | `""` | Runtime cluster name, merged into CR `spec.externalLabels`. Must be set per target. |
 | `map.externalLabels.region` | string | `""` | Region, merged into `spec.externalLabels`. Must be set per target. |
 | `map.externalLabels.cluster_type` | string | `""` | Cluster-type label, merged into `spec.externalLabels`. |
-| `map.thanos.image` | string | `keppel.global.cloud.sap/ccloud-quay-mirror/thanos/thanos` | Thanos sidecar image registry/repository injected into `spec.thanos`. |
 | `map.thanos.version` | string | `v0.42.4` | Thanos sidecar image tag injected into `spec.thanos`. Keep aligned with the monitoring stack's Thanos version. |
 | `map.kubectl.version` | string | `v1.34.8` | kubectl image tag for the rollout-trigger Job. Pin to the runtime cluster's Kubernetes version. |
 
@@ -77,20 +76,12 @@ mutation is a granular map merge, not a replace.
 The relabel Secret currently also downgrades `critical` severity to `warning`
 while the alert path is being validated.
 
-### `objectStorage` — Thanos long-term storage (two-phase)
+### Thanos Object Store Configuration
 
-The Thanos sidecar is always injected (via `map.thanos.version`), so Thanos
-Query can read **live** data from the garden Prometheus immediately. Uploading
-blocks to object storage is a separate, later phase: the object storage cluster
-may not be reachable early in a region build-up, but the observability stack
-must deploy before it. This block gates that second phase.
-
-| Key | Type | Default | Description |
-|---|---|---|---|
-| `objectStorage.enabled` | bool | `false` | When `false`, the sidecar runs StoreAPI-only (live data, no uploads). When `true`, a second MAP injects `spec.thanos.objectStorageConfig` and the objstore Secret is rendered. |
-| `objectStorage.secretName` | string | | Name of the Secret in the `garden` namespace holding the objstore config. |
-| `objectStorage.secretKey` | string | | Key within that Secret. |
-| `objectStorage.config` | string | `""` | The Thanos [objstore config](https://github.com/thanos-io/objstore) content. Use secret references (resolved at deploy time) for credentials. |
+During region builds, object storage as required by Thanos long-term storage might
+only become available at a later stage of the build-up. However, the observability
+stack must deploy before it. For this reason, the Thanos integration is separated
+into two phases:
 
 **Phase 1 — early region (default).** `objectStorage.enabled: false`. The
 sidecar starts, exposes StoreAPI on `:10901`, and Thanos Query sees current
@@ -98,27 +89,25 @@ data. No blocks are uploaded; there is no long-term retention yet.
 
 **Phase 2 — storage available.** Flip `objectStorage.enabled: true` and supply
 `objectStorage.config`. The phase-2 MAP (`gardener-prometheus-thanos-objstore`)
-injects `objectStorageConfig` into `spec.thanos` on every CR UPDATE, so the
-sidecar begins uploading blocks once the Gardener operator reconciles the CR.
+injects and reconciles `objectStorageConfig` in `spec.thanos` on every CR UPDATE.
+The rollout-trigger Job runs on every chart upgrade, so the MAP applies
+immediately after the chart deploy — no manual trigger needed.
 
-> **Initial phase-2 trigger.** A MAP only mutates on a CR write. The
-> rollout-trigger Job runs on every chart upgrade, so flipping
-> `objectStorage.enabled` triggers an immediate admission on the next chart
-> deploy. No manual action needed.
+> Note: The Thanos sidecar is always injected (via `map.thanos.version`), so Thanos
+> Query can read **live** data from the garden Prometheus immediately.
 
-**Changing secretName/secretKey** after phase 2 is safe: the phase-2 MAP
-reconciles `objectStorageConfig` on every Gardener UPDATE, so the new selector
-is applied automatically on the next reconcile cycle.
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `objectStorage.enabled` | bool | `false` | When `false`, the sidecar runs StoreAPI-only (live data, no uploads). When `true`, a MAP injects and reconciles `spec.thanos.objectStorageConfig` on every CR UPDATE, and the objstore Secret is rendered. |
+| `objectStorage.secretName` | string | | Name of the Secret in the `garden` namespace holding the objstore config. |
+| `objectStorage.secretKey` | string | | Key within that Secret. |
+| `objectStorage.config` | string | `""` | The Thanos [objstore config](https://github.com/thanos-io/objstore) content. Use secret references (resolved at deploy time) for credentials. |
 
 **Disabling** (`objectStorage.enabled: false`) installs a cleanup MAP
 (`gardener-prometheus-thanos-objstore-cleanup`) that removes
 `spec.thanos.objectStorageConfig` on the next Gardener reconcile UPDATE,
 preventing Prometheus from referencing the now-deleted Secret. No manual
 `kubectl patch` needed.
-
-The `objectStorage.config` value is a Thanos objstore config document (see the
-[supported providers](https://github.com/thanos-io/objstore)); supply
-credentials as deploy-time secret references rather than inline literals.
 
 ## Minimal values for a new target
 

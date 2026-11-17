@@ -47,4 +47,93 @@ metadata:
 spec:
   policyName: gardener-prometheus-thanos
   matchResources: {}
+{{- if .Values.map.thanos.objectStorage.enabled }}
+# MutatingAdmissionPolicy: inject or update objectStorageConfig in an already-injected
+# spec.thanos. Fires on every CR UPDATE so secretName/secretKey changes self-reconcile
+# on the next Gardener operator reconcile cycle — no manual re-trigger needed.
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: gardener-prometheus-thanos-objstore
+spec:
+  failurePolicy: Ignore
+  reinvocationPolicy: Never
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ["monitoring.coreos.com"]
+      apiVersions: ["v1"]
+      resources: ["prometheuses"]
+      operations: ["CREATE", "UPDATE"]
+  matchConditions:
+  - name: only-prometheus-garden
+    expression: >
+      object.metadata.name == 'garden' &&
+      object.metadata.namespace == 'garden'
+  - name: thanos-present
+    expression: >
+      has(object.spec.thanos)
+  mutations:
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        [JSONPatch{
+          op: "add",
+          path: "/spec/thanos/objectStorageConfig",
+          value: {
+            "name": {{ .Values.map.thanos.objectStorage.secretName | quote }},
+            "key": {{ .Values.map.thanos.objectStorage.secretKey | quote }}
+          }
+        }]
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: gardener-prometheus-thanos-objstore
+spec:
+  policyName: gardener-prometheus-thanos-objstore
+  matchResources: {}
+{{- else }}
+# MutatingAdmissionPolicy: remove objectStorageConfig when objectStorage is disabled.
+# Fires on the next Gardener reconcile UPDATE and removes the stale selector,
+# preventing Prometheus from referencing the now-deleted Secret.
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: gardener-prometheus-thanos-objstore-cleanup
+spec:
+  failurePolicy: Ignore
+  reinvocationPolicy: Never
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ["monitoring.coreos.com"]
+      apiVersions: ["v1"]
+      resources: ["prometheuses"]
+      operations: ["CREATE", "UPDATE"]
+  matchConditions:
+  - name: only-prometheus-garden
+    expression: >
+      object.metadata.name == 'garden' &&
+      object.metadata.namespace == 'garden'
+  - name: objstore-present
+    expression: >
+      has(object.spec.thanos) && has(object.spec.thanos.objectStorageConfig)
+  mutations:
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        [JSONPatch{
+          op: "remove",
+          path: "/spec/thanos/objectStorageConfig"
+        }]
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: gardener-prometheus-thanos-objstore-cleanup
+spec:
+  policyName: gardener-prometheus-thanos-objstore-cleanup
+  matchResources: {}
+{{- end }}
 {{- end }}

@@ -1,0 +1,29 @@
+{{- if .Values.map.enabled }}
+# Allow Thanos Query (in kube-monitoring) to reach the Thanos sidecar on the
+# Garden Prometheus pod over gRPC :10901. The garden namespace has a deny-all
+# NetworkPolicy; without this, the Thanos Query store registration succeeds
+# (service is reachable) but data queries fail silently.
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress-thanos-grpc-from-kube-monitoring
+  namespace: garden
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-monitoring
+      podSelector:
+        matchLabels:
+          app.kubernetes.io/component: query
+    ports:
+    - port: 10901
+      protocol: TCP
+{{- end }}

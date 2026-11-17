@@ -1,8 +1,8 @@
-{{- if and .Values.map.enabled .Values.map.rolloutTriggerJob.enabled }}
+{{- if .Values.map.enabled }}
 # MAP activation trigger.
 #
-# ONE-TIME USE: once the MAP rollout is complete, set
-# map.rolloutTriggerJob.enabled: false to stop deploying this job.
+# Runs on every chart install/upgrade (post-install,post-upgrade hook) so any
+# new or changed MAPs fire immediately on the existing prometheus/garden CR.
 #
 # A MutatingAdmissionPolicy fires only on CREATE/UPDATE; the Prometheus CR the
 # operator already created is not retroactively mutated. This Helm

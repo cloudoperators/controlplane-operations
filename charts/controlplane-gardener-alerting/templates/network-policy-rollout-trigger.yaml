@@ -1,4 +1,4 @@
-{{- if and .Values.map.enabled .Values.map.rolloutTriggerJob.enabled }}
+{{- if .Values.map.enabled }}
 # The garden namespace has a deny-all NetworkPolicy (both ingress and egress).
 # The rollout-trigger Job runs kubectl inside the cluster; it needs egress to the
 # Kubernetes API server to patch the prometheus/garden CR. This policy opens that

@@ -5,12 +5,6 @@ map:
   # the Garden Prometheus CR (garden/garden) on the runtime cluster.
   enabled: false
 
-  rolloutTriggerJob:
-    # -- Deploy the post-install/post-upgrade trigger Job that activates the MAP
-    # by patching an annotation onto prometheus/garden. ONE-TIME USE: set to false
-    # once the MAP rollout is complete.
-    enabled: true
-
   externalLabels:
     # -- cluster, region, cluster_type are merged into prometheus/garden
     # spec.externalLabels by the MAP. Gardener's own labels (e.g. landscape) are
@@ -26,6 +20,19 @@ map:
     # -- Thanos sidecar image tag. Matches kube-prometheus-stack default.
     # Update when bumping the kube-monitoring chart.
     version: v0.42.4
+    objectStorage:
+      # -- Enable the Thanos sidecar object storage config. Set to true once the
+      # Swift/Ceph storage cluster is reachable from the runtime cluster. When false,
+      # the sidecar starts in StoreAPI-only mode (live data, no block uploads).
+      enabled: false
+      # -- Name of the Secret in the `garden` namespace that holds the objstore config.
+      secretName: thanos-garden-objstore
+      # -- Key within the Secret that contains the Thanos objstore config.
+      secretKey: objstore.yml
+      # -- Thanos objstore config content (see https://github.com/thanos-io/objstore
+      # for supported providers and schema). Supply credentials as deploy-time secret
+      # references rather than inline literals.
+      config: ""
 
   kubectl:
     # -- kubectl image tag for the rollout trigger Job.
